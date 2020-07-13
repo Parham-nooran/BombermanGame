@@ -5,11 +5,21 @@ import javafx.scene.image.ImageView;
 
 
 public class Block extends ImageView {
-    public Block(int x, int y,Image image){
+    private int xCenter, yCenter;
+    public Block(int xCenter, int yCenter,Image image){
         super(image);
-        super.relocate(x,y);
+        super.relocate(xCenter,yCenter);
         super.setFitHeight(50);
         super.setFitWidth(50);
+        this.xCenter = xCenter;
+        this.yCenter = yCenter;
     }
 
+    public int getXCenter() {
+        return xCenter;
+    }
+
+    public int getYCenter() {
+        return yCenter;
+    }
 }

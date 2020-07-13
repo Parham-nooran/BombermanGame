@@ -40,9 +40,8 @@ public class JavaFxApplication extends Application {
         stage.setTitle("Faroborz Bobmerman");
         stage.setScene(scene);
         stage.show();
-        stage.setOnCloseRequest(windowEvent -> timer.setNotClosed(false));
+        stage.setOnCloseRequest(windowEvent -> director.setClosed(true));
     }
-
     public void makePlayers(ArrayList<Player> players) throws FileNotFoundException {
         Image[] images = new Image[1];
         images[0] = new Image(new FileInputStream(

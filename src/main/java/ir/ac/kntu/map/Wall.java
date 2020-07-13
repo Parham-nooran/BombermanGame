@@ -1,12 +1,11 @@
 package ir.ac.kntu.map;
 
 import ir.ac.kntu.logic.Element;
-import javafx.scene.image.Image;
 
 public class Wall extends Element {
     private Type type;
-    public Wall(int xCenter, int yCenter, Type type, Image image){
-        super(image, xCenter, yCenter);
+    public Wall(int xCenter, int yCenter, Type type){
+        super(type.getImage(), xCenter, yCenter);
         this.type = type;
         this.relocate(xCenter, yCenter);
         this.setFitHeight(50);

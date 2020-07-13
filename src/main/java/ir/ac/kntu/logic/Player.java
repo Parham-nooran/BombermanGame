@@ -31,7 +31,10 @@ public class Player extends Element implements Movable,Bomber {
     }
     @Override
     public void move(Direction direction){
-        if(pane.getChildren().stream().filter(node -> node instanceof Wall).
+        if(pane.getChildren().stream().filter(node -> node instanceof Wall &&
+                (!((Wall) node).getType().equals(Type.ONE_WAY)||
+                        (((Wall) node).getType().equals(Type.ONE_WAY)&&
+                                !((Wall) node).getType().getSide().getOpenDirection().equals(direction)))).
                 noneMatch(node -> ((Wall) node).getXCenter() == getXCenter() + direction.getXValue() &&
                         ((Wall) node).getYCenter() == getYCenter() + direction.getYValue())) {
             if (getXCenter() + 50 + direction.getXValue() > 0 &&

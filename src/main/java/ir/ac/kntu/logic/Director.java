@@ -20,6 +20,7 @@ public class Director implements Serializable, Runnable {
     private FileManager fileManager;
     private String playersFile;
     private String mapFile;
+    private boolean closed;
     public  Director(Pane pane, ArrayList<Player> players, Timer timer, String playersFile, String mapFile) {
         this.mapFile = mapFile;
         this.playersFile = playersFile;
@@ -59,6 +60,16 @@ public class Director implements Serializable, Runnable {
 
         }
     }
+
+    public boolean isClosed() {
+        return closed;
+    }
+
+    public void setClosed(boolean closed) {
+        this.closed = closed;
+        timer.setNotClosed(!closed);
+    }
+
     public void start(){
         load();
         Thread thread = new Thread(() ->{

@@ -11,7 +11,10 @@ public class Element extends ImageView {
         this.xCenter = xCenter;
         this.yCenter = yCenter;
     }
-
+    public Element(int xCenter, int yCenter){
+        this.xCenter = xCenter;
+        this.yCenter = yCenter;
+    }
     public int getXCenter() {
         return xCenter;
     }

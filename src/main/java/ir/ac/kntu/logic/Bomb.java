@@ -67,12 +67,12 @@ public class Bomb extends ImageView implements Runnable{
     private <T extends Element>boolean filterPositiveXAxis(Node node){
         return ((((T) node).getXCenter()==
                 nearestBrickWall(radius, 0,xCenter, true, false)&&
-                checkForWall(Type.IRON, ((T) node).getXCenter(), ((T) node).getYCenter(), true)));
+                checkForWall(Type.BRICK, ((T) node).getXCenter(), ((T) node).getYCenter(), true)));
     }
     private <T extends Element>boolean filterNegativeXAxis(Node node){
         return (((T) node).getXCenter()==
                 nearestBrickWall(radius, 0, xCenter,false, false)&&
-                checkForWall(Type.IRON, ((T) node).getXCenter(), ((T) node).getYCenter(), false));
+                checkForWall(Type.BRICK, ((T) node).getXCenter(), ((T) node).getYCenter(), false));
     }
     private boolean filterYAxis(Node node){
         return ((filterPositiveYAxis(node)||filterNegativeYAxis(node))&&
@@ -81,11 +81,11 @@ public class Bomb extends ImageView implements Runnable{
     private <T extends Element>boolean filterPositiveYAxis(Node node){
         return (((T) node).getYCenter()==
                 nearestBrickWall(0,radius,yCenter,true, true)&&
-                checkForWall(Type.IRON, ((T) node).getXCenter(), ((T) node).getYCenter(), true));
+                checkForWall(Type.BRICK, ((T) node).getXCenter(), ((T) node).getYCenter(), true));
     }
     private <T extends Element>boolean filterNegativeYAxis(Node node){
         return (((T) node).getYCenter()==nearestBrickWall(0, radius, yCenter, false, true)&&
-                checkForWall(Type.IRON, ((T) node).getXCenter(), ((T) node).getYCenter(), false));
+                checkForWall(Type.BRICK, ((T) node).getXCenter(), ((T) node).getYCenter(), false));
     }
 
 
@@ -122,7 +122,7 @@ public class Bomb extends ImageView implements Runnable{
 
     private boolean checkForWall(Type type, int xCenter, int yCenter, boolean positive){
         return pane.getChildren().stream().filter(node -> node instanceof Wall).
-                filter(node -> ((Wall) node).getType().equals(type)).
+                filter(node -> !((Wall) node).getType().equals(type)).
                 noneMatch(node -> filterWall(node, xCenter, yCenter, positive));
     }
     private boolean checkForWall(int xCenter, int yCenter, boolean positive){

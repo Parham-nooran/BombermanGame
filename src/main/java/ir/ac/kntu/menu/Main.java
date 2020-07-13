@@ -26,7 +26,7 @@ public class Main extends Menu {
             director.start();
         });
         exit.setOnAction(EventHandler ->{
-            director.getTimer().setNotClosed(false);
+            director.setClosed(true);
             stage.close();
         });
     }

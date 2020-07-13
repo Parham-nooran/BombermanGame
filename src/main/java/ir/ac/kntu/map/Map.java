@@ -18,33 +18,31 @@ public class Map implements Serializable {
     public void load()  {
         try {
             Image block = new Image(new FileInputStream("src/main/resources/assets/map/normal.png"));
-            Image ironWall = new Image(new FileInputStream("src/main/resources/assets/map/wall.png"));
-            Image brickWall = new Image(new FileInputStream("src/main/resources/assets/map/block.png"));
             loadBackGround(block);
-            loadIronWalls(ironWall);
-            loadRows(ironWall);
-            loadColumns(ironWall);
-            loadBrickWalls(brickWall);
+            loadIronWalls();
+            loadRows();
+            loadColumns();
+            loadBrickWalls();
         } catch (FileNotFoundException e){
             e.printStackTrace();
         }
     }
-    private void loadRows(Image image){
-        loadARow(0,0,16, image);
-        loadARow(0, 11*50, 16, image);
+    private void loadRows(){
+        loadARow(0,0,16);
+        loadARow(0, 11*50, 16);
     }
-    private void loadColumns(Image image){
-        loadAColumn(0, 50,10, image);
-        loadAColumn(15*50, 50, 10, image);
+    private void loadColumns(){
+        loadAColumn(0, 50,10);
+        loadAColumn(15*50, 50, 10);
     }
-    private void loadARow(int xBegin, int yCenter, int number, Image image){
+    private void loadARow(int xBegin, int yCenter, int number){
         for(int i=0;i<number;i++){
-            director.getPane().getChildren().add(new Wall(50*i+xBegin, yCenter, Type.IRON, image));
+            director.getPane().getChildren().add(new Wall(50*i+xBegin, yCenter, Type.IRON));
         }
     }
-    private void loadAColumn(int xCenter, int yBegin, int number, Image image){
+    private void loadAColumn(int xCenter, int yBegin, int number){
         for(int i=0;i<number;i++){
-            director.getPane().getChildren().add(new Wall(xCenter, 50*i+yBegin, Type.IRON, image));
+            director.getPane().getChildren().add(new Wall(xCenter, 50*i+yBegin, Type.IRON));
         }
     }
     private void loadBackGround(Image image){
@@ -54,26 +52,24 @@ public class Map implements Serializable {
             }
         }
     }
-    private void loadBrickWalls(Image image){
+    private void loadBrickWalls(){
         for (int i = 0; i < 60;) {
             int xCenter = (int) ((16 * Math.random())) * 50, yCenter =(int) ((12 * Math.random())) * 50;
             if(director.getPane().getChildren().stream().filter(node -> node instanceof Element).
                     noneMatch(node -> ((Element)node).getXCenter()==xCenter&&
                             ((Element) node).getYCenter()==yCenter)) {
-                director.getPane().getChildren().add(new Wall(xCenter, yCenter, Type.BRICK, image));
+                director.getPane().getChildren().add(new Wall(xCenter, yCenter, Type.BRICK));
                 i++;
             }
         }
     }
-    private void loadIronWalls(Image image){
+    private void loadIronWalls(){
         for (int i = 1; i < 12; i += 2) {
             for (int j = 1; j < 8; j += 2) {
                 director.getPane().getChildren().
-                        add(new Wall(50 * i + 50, 50 * j + 50, Type.IRON, image));
+                        add(new Wall(50 * i + 50, 50 * j + 50, Type.IRON));
             }
         }
     }
-    public void loadOneWayBlock(Image image){
 
-    }
 }
