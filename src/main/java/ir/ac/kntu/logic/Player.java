@@ -5,6 +5,7 @@ import ir.ac.kntu.map.OneWay;
 import ir.ac.kntu.map.Type;
 import ir.ac.kntu.map.Wall;
 import ir.ac.kntu.status.Timer;
+import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Pane;
@@ -49,34 +50,28 @@ public class Player extends Element implements Movable,Bomber{
     @Override
     public void move(Direction direction){
         checkForPowerUp(direction);
+        new Thread(() -> {
+            try{
+                Thread.sleep(100);
+
+            } catch (InterruptedException e){
+
+            }
+            Platform.runLater(() -> {
+                this.setImage(images[direction.getImageCode()]);
+            });
+        }).start();
         if(checkDestination(direction)) {
-            //if (checkHorizontalMovement(direction)) {
             setXCenter(getXCenter()+ direction.getXValue());
-            //}
-            //if (checkVerticalMovement(direction)) {
             setYCenter(getYCenter()+direction.getYValue());
-            //}
         }
-        /*try{
-            Thread.sleep(1000);
-        }catch (InterruptedException e){
-        }*/
-        //this.setImage(images[direction.getImageCode()+1]);
-        this.setImage(images[direction.getImageCode()]);
+        this.setImage(images[direction.getImageCode()+1]);
         this.relocate(getXCenter(), getYCenter());
     }
     public void stop(Direction direction){
         this.setImage(images[direction.getImageCode()]);
         this.relocate(getXCenter(), getYCenter());
     }
-    /*private boolean checkHorizontalMovement(Direction direction){
-        return getXCenter() + 50 + direction.getXValue() > 0 &&
-                getXCenter() + 50 + direction.getXValue() < pane.getWidth();
-    }
-    private boolean checkVerticalMovement(Direction direction){
-        return getYCenter() + 50 + direction.getYValue() > 0 &&
-                getYCenter() + 50 + direction.getYValue() < pane.getHeight();
-    }*/
     private boolean checkDestination(Direction direction){
         return pane.getChildren().stream().filter(node -> node instanceof Wall &&
                 (!((Wall) node).getType().equals(Type.ONE_WAY)||

@@ -39,16 +39,16 @@ public class Bomb extends Element implements Runnable{
         });
         thread.start();
     }
-    private Image findImage(){
+    private Image findImage(String address){
         try {
-            return new Image(new FileInputStream("src/main/resources/assets/map/bomb.png"));
+            return new Image(new FileInputStream(address));
         } catch (IOException e){
-            System.out.println("Something went wrong while trying to read the bomb image file");
+            System.out.println("Something went wrong while trying to read the image file");
         }
         return null;
     }
     private void setImage(){
-        super.setImage(findImage());
+        super.setImage(findImage("src/main/resources/assets/map/bomb.png"));
         super.setFitHeight(50);
         setFitWidth(50);
     }
@@ -71,15 +71,31 @@ public class Bomb extends Element implements Runnable{
     }
     private void removeBrickWalls(){
         explode();
-        pane.getChildren().removeAll(pane.getChildren().stream().
+    }
+    private void explode(){
+        for(Node node:getBrickWalls()){
+            ((Wall)node).setImage(findImage("src/main/resources/assets/map/block_breaking.png"));
+        }
+        new Thread(() -> {
+            try{
+                Thread.sleep(100);
+
+            } catch (InterruptedException e){
+
+            }
+            Platform.runLater(() -> {
+                pane.getChildren().removeAll(getBrickWalls());
+            });
+        }).start();
+    }
+    private List<Node> getBrickWalls(){
+        return pane.getChildren().stream().
                 filter(node -> node instanceof Wall).
                 filter(node -> ((Wall) node).getType().isBreakable()).
                 filter(node -> (filterXAxis(node)||
-                        filterYAxis(node))).collect(Collectors.toList()));
+                        filterYAxis(node))).collect(Collectors.toList());
     }
-    public void explode(){
 
-    }
     private <T extends Element>boolean filterXAxis(Node node){
         return ((filterPositiveXAxis(node)||
                 filterNegativeXAxis(node))&&((T) node).getYCenter()==getYCenter());
