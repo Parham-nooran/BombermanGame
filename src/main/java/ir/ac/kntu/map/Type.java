@@ -9,7 +9,6 @@ public enum Type {
     BRICK(true, getBrickWallImage()), IRON(false, getIronWallImage()),
     ONE_WAY(false);
     private boolean breakable;
-    private Side side;
     private Image image;
     Type(boolean breakable, Image image){
         this.breakable=breakable;
@@ -19,14 +18,6 @@ public enum Type {
         this.breakable = breakable;
     }
 
-    public void setSide(Side side){
-        this.side = side;
-        this.image = side.getImage();
-    }
-
-    public Side getSide() {
-        return side;
-    }
 
     public boolean isBreakable() {
         return breakable;

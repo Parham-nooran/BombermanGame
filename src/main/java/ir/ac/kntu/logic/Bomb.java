@@ -2,9 +2,9 @@ package ir.ac.kntu.logic;
 
 import ir.ac.kntu.map.Type;
 import ir.ac.kntu.map.Wall;
+import javafx.application.Platform;
 import javafx.scene.Node;
 import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 
 import java.io.FileInputStream;
@@ -12,19 +12,32 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Bomb extends ImageView implements Runnable{
-    private int xCenter;
-    private int yCenter;
+public class Bomb extends Element implements Runnable{
     private Pane pane;
     private int radius;
+    private Player player;
+    public Bomb(Player player){
+        this(player.getPane(), player.getXCenter(), player.getYCenter(), player.getBombRadius());
+        this.player = player;
+    }
     public Bomb(Pane pane, int xCenter, int yCenter, int radius){
-        super();
-        this.xCenter = xCenter;
-        this.yCenter = yCenter;
+        super(xCenter, yCenter);
         this.pane = pane;
         this.radius = radius;
         setImage();
         super.relocate(xCenter, yCenter);
+    }
+    public void start(){
+        pane.getChildren().add(this);
+        Thread thread = new Thread(() ->{
+            try {
+                Thread.sleep(3000);
+            }catch(InterruptedException e){
+                e.printStackTrace();
+            }
+            Platform.runLater(this);
+        });
+        thread.start();
     }
     private Image findImage(){
         try {
@@ -43,6 +56,9 @@ public class Bomb extends ImageView implements Runnable{
         killPlayers();
         removeBrickWalls();
         remove();
+        if(player!=null) {
+            player.setActiveBomb(false);
+        }
     }
     private void killPlayers(){
         deathPlayers().iterator().forEachRemaining(node -> ((Player)node).kill());
@@ -54,68 +70,72 @@ public class Bomb extends ImageView implements Runnable{
                         filterYAxis2(node))).collect(Collectors.toList());
     }
     private void removeBrickWalls(){
+        explode();
         pane.getChildren().removeAll(pane.getChildren().stream().
                 filter(node -> node instanceof Wall).
                 filter(node -> ((Wall) node).getType().isBreakable()).
                 filter(node -> (filterXAxis(node)||
                         filterYAxis(node))).collect(Collectors.toList()));
     }
+    public void explode(){
+
+    }
     private <T extends Element>boolean filterXAxis(Node node){
         return ((filterPositiveXAxis(node)||
-                filterNegativeXAxis(node))&&((T) node).getYCenter()==yCenter);
+                filterNegativeXAxis(node))&&((T) node).getYCenter()==getYCenter());
     }
     private <T extends Element>boolean filterPositiveXAxis(Node node){
         return ((((T) node).getXCenter()==
-                nearestBrickWall(radius, 0,xCenter, true, false)&&
+                nearestBrickWall(radius, 0,getXCenter(), true, false)&&
                 checkForWall(Type.BRICK, ((T) node).getXCenter(), ((T) node).getYCenter(), true)));
     }
     private <T extends Element>boolean filterNegativeXAxis(Node node){
         return (((T) node).getXCenter()==
-                nearestBrickWall(radius, 0, xCenter,false, false)&&
+                nearestBrickWall(radius, 0, getXCenter(),false, false)&&
                 checkForWall(Type.BRICK, ((T) node).getXCenter(), ((T) node).getYCenter(), false));
     }
     private boolean filterYAxis(Node node){
         return ((filterPositiveYAxis(node)||filterNegativeYAxis(node))&&
-                ((Wall) node).getXCenter()==xCenter);
+                ((Wall) node).getXCenter()==getXCenter());
     }
     private <T extends Element>boolean filterPositiveYAxis(Node node){
         return (((T) node).getYCenter()==
-                nearestBrickWall(0,radius,yCenter,true, true)&&
+                nearestBrickWall(0,radius,getYCenter(),true, true)&&
                 checkForWall(Type.BRICK, ((T) node).getXCenter(), ((T) node).getYCenter(), true));
     }
     private <T extends Element>boolean filterNegativeYAxis(Node node){
-        return (((T) node).getYCenter()==nearestBrickWall(0, radius, yCenter, false, true)&&
+        return (((T) node).getYCenter()==nearestBrickWall(0, radius, getYCenter(), false, true)&&
                 checkForWall(Type.BRICK, ((T) node).getXCenter(), ((T) node).getYCenter(), false));
     }
 
 
     private boolean filterXAxis2(Node node){
-        return ((filterPositiveXAxis(node, nearestBrickWall(radius, 0, xCenter, true, false))||
-                filterNegativeXAxis(node, nearestBrickWall(radius, 0, xCenter, false, false)))&&
-                ((Player) node).getYCenter()==yCenter);
+        return ((filterPositiveXAxis(node, nearestBrickWall(radius, 0, getXCenter(), true, false))||
+                filterNegativeXAxis(node, nearestBrickWall(radius, 0, getXCenter(), false, false)))&&
+                ((Player) node).getYCenter()==getYCenter());
     }
 
     private <T extends Element>boolean filterPositiveXAxis(Node node, int radius){
-        return ((((T) node).getXCenter()<=radius&&((T) node).getXCenter()>=xCenter&&
+        return ((((T) node).getXCenter()<=radius&&((T) node).getXCenter()>=getXCenter()&&
                 checkForWall(((T) node).getXCenter(), ((T) node).getYCenter(), true)));
     }
     private <T extends Element>boolean filterNegativeXAxis(Node node, int radius){
-        return (((T) node).getXCenter()>=radius&&((T) node).getXCenter()<=xCenter&&
+        return (((T) node).getXCenter()>=radius&&((T) node).getXCenter()<=getXCenter()&&
                 checkForWall(((T) node).getXCenter(), ((T) node).getYCenter(), false));
     }
     private boolean filterYAxis2(Node node){
-        return ((filterPositiveYAxis(node, nearestWall(0, radius, yCenter, true, true))||
-                filterNegativeYAxis(node, nearestWall(0, radius, yCenter, false, true)))&&
-                ((Player) node).getXCenter()==xCenter);
+        return ((filterPositiveYAxis(node, nearestWall(0, radius, getYCenter(), true, true))||
+                filterNegativeYAxis(node, nearestWall(0, radius, getYCenter(), false, true)))&&
+                ((Player) node).getXCenter()==getXCenter());
     }
     private boolean filterPositiveYAxis(Node node, int radius){
-        return (((Player) node).getYCenter()<=radius&&((Player) node).getYCenter()>=yCenter&&
+        return (((Player) node).getYCenter()<=radius&&((Player) node).getYCenter()>=getYCenter()&&
                 checkForWall(((Player) node).getXCenter(), ((Player) node).getYCenter(), true));
     }
 
 
     private boolean filterNegativeYAxis(Node node, int radius){
-        return (((Player) node).getYCenter()>=radius&&((Player) node).getYCenter()<=yCenter&&
+        return (((Player) node).getYCenter()>=radius&&((Player) node).getYCenter()<=getYCenter()&&
                 checkForWall(((Player) node).getXCenter(), ((Player) node).getYCenter(), false));
     }
 
@@ -131,20 +151,20 @@ public class Bomb extends ImageView implements Runnable{
     }
     private boolean filterWall(Node node, int xCenter, int yCenter, boolean positive){
         return (((Wall) node).getXCenter() <= xCenter &&
-                ((Wall) node).getXCenter() >= this.xCenter &&
-                ((Wall) node).getYCenter() <= yCenter && ((Wall) node).getYCenter() >= this.yCenter
+                ((Wall) node).getXCenter() >= super.getXCenter() &&
+                ((Wall) node).getYCenter() <= yCenter && ((Wall) node).getYCenter() >= getYCenter()
                 && positive) || (((Wall) node).getXCenter() >= xCenter &&
-                ((Wall) node).getXCenter() <= this.xCenter &&
+                ((Wall) node).getXCenter() <= getXCenter() &&
                 ((Wall) node).getYCenter() >= yCenter &&
-                ((Wall) node).getYCenter() <= this.yCenter && !positive);
+                ((Wall) node).getYCenter() <= getYCenter() && !positive);
     }
     private <T extends Element>boolean filterNearestElement(Node node, int xRadius, int yRadius, boolean positive){
-        return (((((T) node).getXCenter()<=xCenter+xRadius&&
-                ((T)node).getYCenter()<=yCenter+yRadius&&
-                ((T) node).getXCenter()>=xCenter&&((T) node).getYCenter()>=yCenter)&&positive)||
-                ((((T) node).getXCenter()>=xCenter-xRadius&&
-                        ((T)node).getYCenter()>=yCenter-yRadius&&
-                        ((T) node).getXCenter()<=xCenter&&((T) node).getYCenter()<=yCenter)&&
+        return (((((T) node).getXCenter()<=getXCenter()+xRadius&&
+                ((T)node).getYCenter()<=getYCenter()+yRadius&&
+                ((T) node).getXCenter()>=getXCenter()&&((T) node).getYCenter()>=getYCenter())&&positive)||
+                ((((T) node).getXCenter()>=getXCenter()-xRadius&&
+                        ((T)node).getYCenter()>=getYCenter()-yRadius&&
+                        ((T) node).getXCenter()<=getXCenter()&&((T) node).getYCenter()<=getYCenter())&&
                         !positive));
     }
     private List<Node> nearestWalls(int xRadius, int yRadius, boolean positive){

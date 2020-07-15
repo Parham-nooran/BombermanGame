@@ -7,4 +7,8 @@ public abstract class Menu {
     public Menu(Pane pane){
         this.pane = pane;
     }
+
+    public Pane getPane() {
+        return pane;
+    }
 }
