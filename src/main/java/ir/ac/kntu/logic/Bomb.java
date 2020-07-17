@@ -57,7 +57,7 @@ public class Bomb extends Element implements Runnable{
         removeBrickWalls();
         remove();
         if(player!=null) {
-            player.setActiveBomb(false);
+            player.setActiveBombs(player.getActiveBombs()-1);
         }
     }
     private void killPlayers(){
@@ -81,7 +81,7 @@ public class Bomb extends Element implements Runnable{
                 Thread.sleep(100);
 
             } catch (InterruptedException e){
-
+                System.out.println("Bomb explosion interrupted");
             }
             Platform.runLater(() -> {
                 pane.getChildren().removeAll(getBrickWalls());

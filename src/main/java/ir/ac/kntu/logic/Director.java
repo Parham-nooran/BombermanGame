@@ -1,45 +1,47 @@
 package ir.ac.kntu.logic;
 
+import ir.ac.kntu.file.FileManager;
 import ir.ac.kntu.map.Map;
 import ir.ac.kntu.menu.Main;
+import ir.ac.kntu.menu.Ranking;
 import ir.ac.kntu.status.Timer;
 import javafx.application.Platform;
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
 
 public class Director implements Runnable {
     private ArrayList<Player> players;
-    private Pane pane;
-    private Timer<Integer> timer;
+    private SerializedPane pane;
+    private Timer timer;
     private Map map;
     private boolean finished;
     private boolean closed;
     private Integer numberOfPlayers;
+    private Main main;
     private String mapFile;
     private Stage stage;
     private Scene scene;
-    public  Director(Pane pane, Stage stage, Scene scene, Integer numberOfPlayers, String mapFile) {
+    public  Director(SerializedPane pane, Stage stage, Scene scene, Integer numberOfPlayers, String mapFile) {
         this.mapFile = mapFile;
         this.players = new ArrayList<>();
         this.numberOfPlayers = numberOfPlayers;
         this.scene = scene;
+        this.timer = new Timer(pane, 0, 3,0,true);
         makePlayers(new String[]{"Normal","Red", "Yellow", "Black"}, new Integer[]{50, 100, 200, 400},
                 new Integer[]{250, 350, 350,  250},
                 new String[]{"", "_red", "_yellow", "_black"});
         this.stage = stage;
         this.pane = pane;
         this.closed = false;
-        this.timer = new Timer<>((SerializedPane) pane, 0, 3,0,true);;
         this.map = new Map(this);
         this.finished = false;
         setPlayersDirector();
         stage.setOnCloseRequest(windowEvent -> {
-            finished = closed =true;
+            setClosed(true);
             stage.close();
         });
     }
@@ -48,9 +50,10 @@ public class Director implements Runnable {
         this.map = map;
     }
     private void setPlayersDirector(){
-        players.iterator().forEachRemaining(player -> player.setDirector(this));
+        players.iterator().forEachRemaining(player -> player.setPane(this.getPane()));
     }
-    public Pane getPane(){
+
+    public SerializedPane getPane() {
         return pane;
     }
 
@@ -76,12 +79,14 @@ public class Director implements Runnable {
         Thread thread = new Thread(() ->{
             while(!finished){
                 try{
-                    Thread.sleep(17);
+                    Thread.sleep(100);
                 }catch (InterruptedException e){
                     System.out.println("Director has been interrupted");
                     e.printStackTrace();
                 }
-                Platform.runLater(this);
+                if(!finished) {
+                    Platform.runLater(this);
+                }
             }
         });
         thread.start();
@@ -90,6 +95,10 @@ public class Director implements Runnable {
 
     public void setNumberOfPlayers(Integer numberOfPlayers) {
         this.numberOfPlayers = numberOfPlayers;
+    }
+
+    public boolean isClosed() {
+        return closed;
     }
 
     private void load(){
@@ -103,16 +112,35 @@ public class Director implements Runnable {
         finished = timer.isFinished()|| pane.getChildren().stream().filter(node -> node instanceof Player).count()<2;
         timer.setFinished(finished);
         if(finished&&!closed){
+            checkPlayers();
+            new FileManager().storeInFile(players, "players.txt");
             pane.getChildren().removeAll(pane.getChildren());
-            new Main(pane, stage, scene).load();
+            new Ranking(this).load();
+            this.main = new Main(pane, stage, scene);
         }
+    }
+    private void checkPlayers(){
+        players.iterator().forEachRemaining(player -> {
+            if(player.isAlive()){
+                player.kill();
+            }
+        });
+    }
+    public Main getMain() {
+        return main;
     }
 
     public void setFinished(boolean finished) {
         this.finished = finished;
-        players.iterator().forEachRemaining(Player::kill);
-    }
 
+    }
+    public void setClosed(boolean closed) {
+        this.closed = closed;
+        timer.setFinished(closed);
+        if(closed) {
+            players.iterator().forEachRemaining(Player::kill);
+        }
+    }
     private void movePlayer1(KeyCode keyCode){
         Player player = players.get(0);
         if(player.isAlive()){
@@ -212,9 +240,12 @@ public class Director implements Runnable {
 
     public void makePlayers(String[]names, Integer[]xCenters, Integer[]yCenters, String[]colors) {
         for(int i=0;i<numberOfPlayers;i++){
-            players.add(new Player(names[i], xCenters[i], yCenters[i], initializePlayer(colors[i])));
+            players.add(new Player(names[i], xCenters[i], yCenters[i], initializePlayer(colors[i]),timer));
         }
     }
+
+
+
     private String[] initializePlayer(String color){
         String [] playerImages = new String[8];
         playerImages[0] = "src/main/resources/assets/player"+color+"/player"+color+"_right_standing.png";

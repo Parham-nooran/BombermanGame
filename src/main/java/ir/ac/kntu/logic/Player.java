@@ -1,6 +1,5 @@
 package ir.ac.kntu.logic;
 
-import ir.ac.kntu.file.FileManager;
 import ir.ac.kntu.map.OneWay;
 import ir.ac.kntu.map.Type;
 import ir.ac.kntu.map.Wall;
@@ -12,66 +11,95 @@ import javafx.scene.layout.Pane;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.Serializable;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class Player extends Element implements Movable,Bomber{
+public class Player extends Element implements Movable,Bomber, Serializable {
     private String name;
-    private SerializedImage [] images;
+    private int time;
+    private int numberOfGames;
+    private int wins;
+    private String[] addresses;
     private boolean isAlive;
-    private Pane pane;
+    private SerializedPane pane;
     private int bombRadius;
-    private boolean activeBomb;
-    private FileManager fileManager;
-    public Player(String name, int xCenter, int yCenter, String[]addresses){
+    private int activeBombs;
+    private Timer timer;
+    public Player(String name, int xCenter, int yCenter, String[]addresses, Timer timer){
         super(xCenter, yCenter);
         this.name = name;
         this.bombRadius = 150;
-        this.fileManager = new FileManager();
-        this.images = new SerializedImage[8];
-        loadImages(addresses);
-        setImageStatus(xCenter, yCenter, images);
+        this.addresses = addresses;
+        this.setImage(loadImage(addresses[0]));
+        setImageStatus();
+        this.timer = timer;
+        //this.images = new SerializedImage[8];
+        //loadImages(addresses);
+        //setImageStatus(xCenter, yCenter, ));
     }
-    private void loadImages(String[]addresses){
+    /*private void loadImages(String[]addresses){
         try {
             for (int i = 0; i < 8; i++) {
                 this.images[i] = new SerializedImage(new FileInputStream(addresses[i]));
             }
         } catch(FileNotFoundException e){
-            System.out.println();;
+            System.out.println();
         }
+    }*/
+    public Image loadImage(String address){
+        try{
+
+            return new Image(new FileInputStream(address));
+        } catch (FileNotFoundException e){
+            System.out.println();
+        }
+        return null;
     }
-    private void setImageStatus(int xCenter, int yCenter, Image[]images){
+    private void setImageStatus(){
+        this.relocate(getXCenter(),getYCenter());
+        this.setFitHeight(50);
+        this.setFitWidth(50);
+    }
+    /*private void setImagesStatus(int xCenter, int yCenter, Image[]images){
         this.setImage(images[0]);
         this.relocate(xCenter,yCenter);
         this.setFitHeight(50);
         this.setFitWidth(50);
-    }
+    }*/
     @Override
     public void move(Direction direction){
         checkForPowerUp(direction);
+        changeImage(direction);
+        if(checkDestination(direction)) {
+            setXCenter(getXCenter()+ direction.getXValue());
+            setYCenter(getYCenter()+direction.getYValue());
+        }
+        this.setImage(loadImage(addresses[direction.getImageCode()+1]));
+        this.relocate(getXCenter(), getYCenter());
+    }
+    private void changeImage(Direction direction){
         new Thread(() -> {
             try{
                 Thread.sleep(100);
 
             } catch (InterruptedException e){
-
+                System.out.println("Image changing was interrupted");
             }
-            Platform.runLater(() -> {
-                this.setImage(images[direction.getImageCode()]);
-            });
+            Platform.runLater(() -> this.setImage(loadImage(addresses[direction.getImageCode()])));
         }).start();
-        if(checkDestination(direction)) {
-            setXCenter(getXCenter()+ direction.getXValue());
-            setYCenter(getYCenter()+direction.getYValue());
-        }
-        this.setImage(images[direction.getImageCode()+1]);
-        this.relocate(getXCenter(), getYCenter());
     }
-    public void stop(Direction direction){
-        this.setImage(images[direction.getImageCode()]);
-        this.relocate(getXCenter(), getYCenter());
+
+    public int getActiveBombs() {
+        return activeBombs;
     }
+
+    public void setActiveBombs(int activeBombs) {
+        this.activeBombs = activeBombs;
+    }
+
     private boolean checkDestination(Direction direction){
         return pane.getChildren().stream().filter(node -> node instanceof Wall &&
                 (!((Wall) node).getType().equals(Type.ONE_WAY)||
@@ -92,21 +120,27 @@ public class Player extends Element implements Movable,Bomber{
                 getYCenter()==getYCenter()+direction.getYValue()).collect(Collectors.toList());
     }
     private void addBombRadius(){
-        Timer<Integer> timer = new Timer<>(0, 0, 15, true);
+        Timer timer = new Timer(0, 0, 15, true);
         timer.setThread();
         bombRadius = 250;
         timer.setBeginAndEnd(this.bombRadius, 150);
     }
     public void kill(){
         this.isAlive = false;
-        fileManager.storeInFile(this, "players.txt");
+        this.time = timer.getMinute()*100+timer.getSecond();
+        this.numberOfGames++;
         pane.getChildren().remove(this);
     }
+
     public void setBomb(){
-        if(!activeBomb) {
-            activeBomb = true;
+        if(activeBombs<1) {
+            activeBombs ++;
             new Bomb(this).start();
         }
+    }
+
+    public Timer getTimer() {
+        return timer;
     }
 
     public int getBombRadius() {
@@ -119,13 +153,8 @@ public class Player extends Element implements Movable,Bomber{
     }
 
 
-
-    public void setActiveBomb(boolean activeBomb) {
-        this.activeBomb = activeBomb;
-    }
-
-    public void setDirector(Director director) {
-        this.pane = director.getPane();
+    public void setPane(SerializedPane pane) {
+        this.pane = pane;
     }
 
     public void load(){
@@ -150,27 +179,58 @@ public class Player extends Element implements Movable,Bomber{
         return isAlive;
     }
 
-    /*@Override
+
+
+    public int getTime() {
+        return time;
+    }
+
+    public void setTime(int time) {
+        this.time = time;
+    }
+
+    public void setNumberOfGames(int numberOfGames) {
+        this.numberOfGames = numberOfGames;
+    }
+
+    public int getNumberOfGames() {
+        return numberOfGames;
+    }
+
+    @Override
     public boolean equals(Object o) {
-        if (this == o){
+        if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
         Player player = (Player) o;
-        return isAlive == player.isAlive &&
-                bombRadius == player.bombRadius &&
-                Objects.equals(name, player.name) &&
-                director.equals(player.director) &&
-                Arrays.equals(images, player.images) &&
-                pane.equals(player.pane);
+        return name.equals(player.name);
     }
 
     @Override
     public int hashCode() {
-        int result = Objects.hash(name, director, isAlive, pane, bombRadius);
-        result = 31 * result + Arrays.hashCode(images);
-        return result;
-    }*/
+        return Objects.hash(name);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public String toString() {
+        return "Player{" +
+                "name='" + name + '\'' +
+                ", time=" + time +
+                ", numberOfGames=" + numberOfGames +
+                ", wins=" + wins +
+                ", addresses=" + Arrays.toString(addresses) +
+                ", isAlive=" + isAlive +
+                ", pane=" + pane +
+                ", bombRadius=" + bombRadius +
+                ", activeBombs=" + activeBombs +
+                ", timer=" + timer +
+                '}';
+    }
 }

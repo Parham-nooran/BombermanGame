@@ -36,7 +36,7 @@ public class Random implements Runnable{
     }
     public void start(){
         new Thread(() ->{
-            while(!director.isFinished()){
+            while(!director.isFinished()&&!director.isClosed()){
                 try {
                     Thread.sleep(5000);
                 } catch(InterruptedException e){

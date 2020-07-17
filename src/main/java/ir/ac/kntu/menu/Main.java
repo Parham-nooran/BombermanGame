@@ -1,12 +1,12 @@
 package ir.ac.kntu.menu;
 
 import ir.ac.kntu.logic.Director;
+import ir.ac.kntu.logic.SerializedPane;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
-import javafx.scene.layout.Pane;
 import javafx.stage.Stage;
 
 public class Main extends Menu {
@@ -17,14 +17,15 @@ public class Main extends Menu {
     private Director director;
     private Stage stage;
     private Scene scene;
-    public Main(Pane pane, Stage stage, Scene scene){
+    private Label label;
+    public Main(SerializedPane pane, Stage stage, Scene scene){
         super(pane);
         this.stage = stage;
         this.start = new Button("Start");
         setStartStatus();
         this.spinner = new Spinner<>();
         setSpinnerStatus();
-        setLabel();
+        setLabelStatus();
         this.exit = new Button("Exit");
         setEndStatus();
         this.setOnAction(pane);
@@ -32,7 +33,7 @@ public class Main extends Menu {
 
     }
     public void load(){
-        getPane().getChildren().addAll(start, exit, spinner);
+        getPane().getChildren().addAll(start, exit, spinner, label);
     }
     private void setStartStatus(){
         start.setMinSize(150,50);
@@ -46,11 +47,10 @@ public class Main extends Menu {
         spinner.setLayoutY(250);
 
     }
-    private void setLabel(){
-        Label label = new Label("Number of Players");
+    private void setLabelStatus(){
+        this.label = new Label("Number of Players");
         label.setLayoutX(150);
         label.setLayoutY(270);
-        getPane().getChildren().add(label);
     }
     private SpinnerValueFactory<Integer> getValueFactory(int initialValue){
         return new SpinnerValueFactory.IntegerSpinnerValueFactory(2,4, initialValue);
@@ -61,7 +61,7 @@ public class Main extends Menu {
         exit.setLayoutY(300);
     }
 
-    public void setOnAction(Pane pane){
+    public void setOnAction(SerializedPane pane){
         start.setOnAction( EventHandler ->{
             pane.getChildren().removeAll(pane.getChildren());
             this.director = new Director(pane, stage, scene, numberOfPlayers, "map.txt");
@@ -70,7 +70,9 @@ public class Main extends Menu {
         });
         spinner.valueProperty().addListener((observable, oldValue, newValue) -> numberOfPlayers=newValue);
         exit.setOnAction(EventHandler ->{
-            director.setFinished(true);
+            if(director!=null) {
+                director.setFinished(true);
+            }
             stage.close();
         });
     }

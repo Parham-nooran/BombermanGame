@@ -8,6 +8,8 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
+import java.io.File;
+
 public class JavaFxApplication extends Application {
     public static void main(String[] args) {
         launch(args);
@@ -16,6 +18,8 @@ public class JavaFxApplication extends Application {
         SerializedPane root = new SerializedPane();
         //GridPane pane = new GridPane();
         //root.setStyle("-fx-border-width: 0 0 5 0;");
+        File file = new File("players.txt");
+        file.delete();
         Scene scene = new Scene(root, 800, 600, Color.rgb(240, 240, 240));
         Main main = new Main(root, stage, scene);
         main.load();
@@ -25,7 +29,9 @@ public class JavaFxApplication extends Application {
         stage.setScene(scene);
         stage.show();
         stage.setOnCloseRequest(windowEvent -> {
-            main.getDirector().setFinished(true);
+            if(main.getDirector()!=null) {
+                main.getDirector().setClosed(true);
+            }
             stage.close();
         });
     }

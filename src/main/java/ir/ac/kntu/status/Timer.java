@@ -2,24 +2,23 @@ package ir.ac.kntu.status;
 
 import ir.ac.kntu.logic.SerializedPane;
 import javafx.application.Platform;
-import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
 
 import java.io.Serializable;
 
-public class Timer<T> implements Runnable, Serializable {
+public class Timer implements Runnable, Serializable {
     private int second;
     private int minute;
     private int hour;
-    private Label label;
+    private SerializedLabel label;
     private SerializedPane pane;
     private boolean countDown;
     private boolean finished;
-    private T object;
-    private T end;
+    private Integer object;
+    private Integer end;
     public Timer(SerializedPane pane, int hour, int minute, int second, boolean countDown){
         this(hour, minute, second, countDown);
-        this.label = new Label();
+        this.label = new SerializedLabel();
         label.setLayoutX(200);
         label.setLayoutY(5);
         this.pane = pane;
@@ -78,7 +77,7 @@ public class Timer<T> implements Runnable, Serializable {
         this.finished = finished;
     }
 
-    public void setBeginAndEnd(T object, T end) {
+    public void setBeginAndEnd(Integer target, Integer end) {
         this.object = object;
         this.end = end;
     }
@@ -118,4 +117,15 @@ public class Timer<T> implements Runnable, Serializable {
         thread.start();
     }
 
+    public int getSecond() {
+        return second;
+    }
+
+    public int getMinute() {
+        return minute;
+    }
+
+    public int getHour() {
+        return hour;
+    }
 }
