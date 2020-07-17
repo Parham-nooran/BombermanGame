@@ -33,10 +33,10 @@ public class FileManager implements Serializable{
                 FileOutputStream fileOutputStream = new FileOutputStream(address);
                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)
         ) {
-
             for(Player player :players){
                 for(Player oldOne:oldPlayers){
                     player.setNumberOfGames(player.equals(oldOne)?oldOne.getNumberOfGames():player.getNumberOfGames());
+                    player.setWins(player.equals(oldOne)?oldOne.getWins():player.getWins());
                 }
             }
             for(Player player:players){

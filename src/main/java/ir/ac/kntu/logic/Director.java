@@ -122,6 +122,7 @@ public class Director implements Runnable {
     private void checkPlayers(){
         players.iterator().forEachRemaining(player -> {
             if(player.isAlive()){
+                player.setTime(0);
                 player.kill();
             }
         });

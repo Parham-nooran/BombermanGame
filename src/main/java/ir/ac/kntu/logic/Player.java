@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class Player extends Element implements Movable,Bomber, Serializable {
+public class Player extends Element implements Movable, Bomber, Serializable, Comparable {
     private String name;
     private int time;
     private int numberOfGames;
@@ -127,7 +127,9 @@ public class Player extends Element implements Movable,Bomber, Serializable {
     }
     public void kill(){
         this.isAlive = false;
-        this.time = timer.getMinute()*100+timer.getSecond();
+        if(!timer.isFinished()) {
+            this.time = timer.getMinute() * 100 + timer.getSecond();
+        }
         this.numberOfGames++;
         pane.getChildren().remove(this);
     }
@@ -209,6 +211,18 @@ public class Player extends Element implements Movable,Bomber, Serializable {
         return name.equals(player.name);
     }
 
+    public Image[] getRankingImages(){
+        return new Image[]{loadImage(addresses[6]),loadImage(addresses[7])};
+    }
+
+    public int getWins() {
+        return wins;
+    }
+
+    public void setWins(int wins) {
+        this.wins = wins;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hash(name);
@@ -232,5 +246,10 @@ public class Player extends Element implements Movable,Bomber, Serializable {
                 ", activeBombs=" + activeBombs +
                 ", timer=" + timer +
                 '}';
+    }
+
+    @Override
+    public int compareTo(Object o) {
+        return this.time-((Player)o).getTime();
     }
 }
