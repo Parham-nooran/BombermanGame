@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class Player extends Element implements Movable, Bomber, Serializable, Comparable {
+public class Player extends Element implements Movable, Bomber, Serializable, Comparable<Object> {
     private String name;
     private int time;
     private int numberOfGames;
@@ -28,30 +28,18 @@ public class Player extends Element implements Movable, Bomber, Serializable, Co
     private int bombRadius;
     private int activeBombs;
     private Timer timer;
-    public Player(String name, int xCenter, int yCenter, String[]addresses, Timer timer){
+    public Player(String name, int xCenter, int yCenter, SerializedPane pane, String[]addresses, Timer timer){
         super(xCenter, yCenter);
         this.name = name;
         this.bombRadius = 150;
         this.addresses = addresses;
-        this.setImage(loadImage(addresses[0]));
+        this.pane = pane;
+        this.setImage(loadImage(addresses[xCenter>270?2:0]));
         setImageStatus();
         this.timer = timer;
-        //this.images = new SerializedImage[8];
-        //loadImages(addresses);
-        //setImageStatus(xCenter, yCenter, ));
     }
-    /*private void loadImages(String[]addresses){
-        try {
-            for (int i = 0; i < 8; i++) {
-                this.images[i] = new SerializedImage(new FileInputStream(addresses[i]));
-            }
-        } catch(FileNotFoundException e){
-            System.out.println();
-        }
-    }*/
     public Image loadImage(String address){
         try{
-
             return new Image(new FileInputStream(address));
         } catch (FileNotFoundException e){
             System.out.println();
@@ -63,12 +51,6 @@ public class Player extends Element implements Movable, Bomber, Serializable, Co
         this.setFitHeight(50);
         this.setFitWidth(50);
     }
-    /*private void setImagesStatus(int xCenter, int yCenter, Image[]images){
-        this.setImage(images[0]);
-        this.relocate(xCenter,yCenter);
-        this.setFitHeight(50);
-        this.setFitWidth(50);
-    }*/
     @Override
     public void move(Direction direction){
         checkForPowerUp(direction);
@@ -101,7 +83,7 @@ public class Player extends Element implements Movable, Bomber, Serializable, Co
     }
 
     private boolean checkDestination(Direction direction){
-        return pane.getChildren().stream().filter(node -> node instanceof Wall &&
+        return pane.getChildren().stream().filter(node ->  node instanceof Wall &&
                 (!((Wall) node).getType().equals(Type.ONE_WAY)||
                         (((Wall) node).getType().equals(Type.ONE_WAY)&&
                                 !((OneWay) node).getSide().getOpenDirection().equals(direction)))).
@@ -141,10 +123,6 @@ public class Player extends Element implements Movable, Bomber, Serializable, Co
         }
     }
 
-    public Timer getTimer() {
-        return timer;
-    }
-
     public int getBombRadius() {
         return bombRadius;
     }
@@ -154,17 +132,12 @@ public class Player extends Element implements Movable, Bomber, Serializable, Co
         return pane;
     }
 
-
-    public void setPane(SerializedPane pane) {
-        this.pane = pane;
-    }
-
     public void load(){
         pane.getChildren().add(this);
         this.isAlive = true;
-        removeBrickWalls();
+        removeBrickWall();
     }
-    private void removeBrickWalls(){
+    private void removeBrickWall(){
         pane.getChildren().removeAll(pane.getChildren().stream().filter(this::filterWalls).
                 collect(Collectors.toList()));
     }
@@ -180,8 +153,6 @@ public class Player extends Element implements Movable, Bomber, Serializable, Co
     public boolean isAlive() {
         return isAlive;
     }
-
-
 
     public int getTime() {
         return time;

@@ -31,26 +31,21 @@ public class Director implements Runnable {
         this.numberOfPlayers = numberOfPlayers;
         this.scene = scene;
         this.timer = new Timer(pane, 0, 3,0,true);
-        makePlayers(new String[]{"Normal","Red", "Yellow", "Black"}, new Integer[]{50, 100, 200, 400},
-                new Integer[]{250, 350, 350,  250},
-                new String[]{"", "_red", "_yellow", "_black"});
         this.stage = stage;
         this.pane = pane;
         this.closed = false;
-        this.map = new Map(this);
+        this.map = new Map(this, mapFile);
         this.finished = false;
-        setPlayersDirector();
+        setStageStatus();
+    }
+    private void setStageStatus(){
         stage.setOnCloseRequest(windowEvent -> {
             setClosed(true);
             stage.close();
         });
     }
-
     public void setMap(Map map) {
         this.map = map;
-    }
-    private void setPlayersDirector(){
-        players.iterator().forEachRemaining(player -> player.setPane(this.getPane()));
     }
 
     public SerializedPane getPane() {
@@ -59,17 +54,15 @@ public class Director implements Runnable {
 
     public void actionOnKeyPress(KeyEvent keyEvent){
         if(!players.isEmpty()) {
-            if(players.size()>0) {
-                movePlayer1(keyEvent.getCode());
-                if(players.size()>1) {
-                    movePlayer2(keyEvent.getCode());
-                }
-                if(players.size()>2) {
-                    movePlayer3(keyEvent.getCode());
-                }
-                if(players.size()>3) {
-                    movePlayer4(keyEvent.getCode());
-                }
+            movePlayer1(keyEvent.getCode());
+            if(players.size()>1) {
+                movePlayer2(keyEvent.getCode());
+            }
+            if(players.size()>2) {
+                movePlayer3(keyEvent.getCode());
+            }
+            if(players.size()>3) {
+                movePlayer4(keyEvent.getCode());
             }
         }
     }
@@ -93,16 +86,13 @@ public class Director implements Runnable {
     }
 
 
-    public void setNumberOfPlayers(Integer numberOfPlayers) {
-        this.numberOfPlayers = numberOfPlayers;
-    }
-
     public boolean isClosed() {
         return closed;
     }
 
     private void load(){
         map.load();
+        makePlayers(new String[]{"Normal","Red", "Yellow", "Black"}, new String[]{"", "_red", "_yellow", "_black"});
         players.iterator().forEachRemaining(Player::load);
         new Random(this).start();
         timer.load();
@@ -239,15 +229,16 @@ public class Director implements Runnable {
         return finished;
     }
 
-    public void makePlayers(String[]names, Integer[]xCenters, Integer[]yCenters, String[]colors) {
+    public void makePlayers(String[]names, String[]colors) {
         for(int i=0;i<numberOfPlayers;i++){
-            players.add(new Player(names[i], xCenters[i], yCenters[i], initializePlayer(colors[i]),timer));
+            players.add(new Player(names[i], map.getPlayersCoordinates().get(i)/1000,
+                    map.getPlayersCoordinates().get(i)%1000, pane, getPlayerImages(colors[i]),timer));
         }
     }
 
 
 
-    private String[] initializePlayer(String color){
+    private String[] getPlayerImages(String color){
         String [] playerImages = new String[8];
         playerImages[0] = "src/main/resources/assets/player"+color+"/player"+color+"_right_standing.png";
         playerImages[1] = "src/main/resources/assets/player"+color+"/player"+color+"_right_moving.png";

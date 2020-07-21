@@ -64,7 +64,8 @@ public class Main extends Menu {
     public void setOnAction(SerializedPane pane){
         start.setOnAction( EventHandler ->{
             pane.getChildren().removeAll(pane.getChildren());
-            this.director = new Director(pane, stage, scene, numberOfPlayers, "map.txt");
+            this.director = new Director(pane, stage, scene, numberOfPlayers,
+                    "src/main/resources/map-builder/index.html");
             scene.setOnKeyPressed(this.director::actionOnKeyPress);
             director.start();
         });

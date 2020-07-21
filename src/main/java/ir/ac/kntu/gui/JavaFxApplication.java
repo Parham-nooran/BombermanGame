@@ -18,9 +18,8 @@ public class JavaFxApplication extends Application {
         SerializedPane root = new SerializedPane();
         //GridPane pane = new GridPane();
         //root.setStyle("-fx-border-width: 0 0 5 0;");
-        File file = new File("players.txt");
-        file.delete();
-        Scene scene = new Scene(root, 800, 600, Color.rgb(240, 240, 240));
+        checkPlayersFile();
+        Scene scene = new Scene(root, 760, 560, Color.rgb(240, 240, 240));
         Main main = new Main(root, stage, scene);
         main.load();
         // Setting stage properties
@@ -34,5 +33,9 @@ public class JavaFxApplication extends Application {
             }
             stage.close();
         });
+    }
+    private void checkPlayersFile(){
+        File file = new File("players.txt");
+        file.delete();
     }
 }
