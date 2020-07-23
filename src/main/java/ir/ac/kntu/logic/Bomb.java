@@ -54,7 +54,7 @@ public class Bomb extends Element implements Runnable{
     }
     public void run(){
         killPlayers();
-        removeBrickWalls();
+        blast();
         remove();
         if(player!=null) {
             player.setActiveBombs(player.getActiveBombs()-1);
@@ -69,13 +69,23 @@ public class Bomb extends Element implements Runnable{
                 filter(node -> (filterXAxis2(node)||
                         filterYAxis2(node))).collect(Collectors.toList());
     }
-    private void removeBrickWalls(){
+    private void blast(){
         explode();
     }
     private void explode(){
+        burnWalls();
+        makeFire();
+        removeBrickWalls();
+    }
+    private void burnWalls(){
         for(Node node:getBrickWalls()){
             ((Wall)node).setImage(findImage("src/main/resources/assets/map/block_breaking.png"));
         }
+    }
+    private void makeFire(){
+
+    }
+    private void removeBrickWalls(){
         new Thread(() -> {
             try{
                 Thread.sleep(100);

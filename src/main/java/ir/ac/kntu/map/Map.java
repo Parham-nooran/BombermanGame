@@ -1,7 +1,6 @@
 package ir.ac.kntu.map;
 
 import ir.ac.kntu.logic.Director;
-import ir.ac.kntu.logic.Element;
 import ir.ac.kntu.logic.PowerUp;
 import javafx.scene.image.Image;
 
@@ -15,10 +14,12 @@ public class Map implements Serializable {
     private String address;
     private String[][] elements;
     private ArrayList<Integer> playersCoordinates;
-    public Map(Director director, String address) {
+    private int size;
+    public Map(Director director, String address, int size) {
         this.director = director;
         this.address = address;
         elements = new String[12][];
+        this.size = size;
         playersCoordinates = new ArrayList<>();
         director.setMap(this);
     }
@@ -26,20 +27,20 @@ public class Map implements Serializable {
         try {
             Image block = new Image(new FileInputStream("src/main/resources/assets/map/normal.png"));
             loadBackGround(block);
-            /*loadIronWalls();
-            loadRows();
-            loadColumns();
-            loadBrickWalls();*/
-            loadElements();
+            loadElements(true);
         } catch (FileNotFoundException e){
             e.printStackTrace();
         }
     }
-    private void loadElements(){
+    public void loadElements(boolean addToPane){
         readMapFile();
-        for(int i=0;i<11;i++){
-            for(int j=0;j<15;j++) {
-                loadElement(elements[i][j], 50*j, 50*i);
+        for (int i = 0; i < 11; i++) {
+            for (int j = 0; j < 15; j++) {
+                if(addToPane) {
+                    loadElement(elements[i][j], size * j, size * i);
+                } else {
+                    loadElementInArray(elements[i][j], size * j, size * i);
+                }
             }
         }
     }
@@ -76,55 +77,40 @@ public class Map implements Serializable {
                 break;
         }
     }
-
-    public ArrayList<Integer> getPlayersCoordinates() {
+    private void loadElementInArray(String element, int xCenter, int yCenter){
+        switch (element){
+            case "p":
+            case "b":
+            case "w":
+            case "r":
+            case "l":
+            case "d":
+            case "u":
+            case "":
+                break;
+            default:
+                int place = Integer.parseInt(element);
+                if(place>0&&place<5){
+                    playersCoordinates.add(1000*xCenter+yCenter);
+                }
+                break;
+        }
+    }
+    public ArrayList<Integer> getPlayersCoordinates(boolean addToPane) {
+        if(playersCoordinates.isEmpty()){
+            loadElements(addToPane);
+        }
         return new ArrayList<>(playersCoordinates);
     }
 
-    private void loadRows(){
-        loadARow(0,0,16);
-        loadARow(0, 11*50, 16);
-    }
-    private void loadColumns(){
-        loadAColumn(0, 50,10);
-        loadAColumn(15*50, 50, 10);
-    }
-    private void loadARow(int xBegin, int yCenter, int number){
-        for(int i=0;i<number;i++){
-            director.getPane().getChildren().add(new Wall(50*i+xBegin, yCenter, Type.IRON));
-        }
-    }
-    private void loadAColumn(int xCenter, int yBegin, int number){
-        for(int i=0;i<number;i++){
-            director.getPane().getChildren().add(new Wall(xCenter, 50*i+yBegin, Type.IRON));
-        }
-    }
     private void loadBackGround(Image image){
         for(int i=0;i<16;i++){
             for(int j=0;j<12;j++){
-                director.getPane().getChildren().add(new Block(50*i,50*j,image));
+                director.getPane().getChildren().add(new Block(size*i,size*j,image));
             }
         }
     }
-    private void loadBrickWalls(){
-        for (int i = 0; i < 60;) {
-            int xCenter = (int) ((16 * Math.random())) * 50, yCenter =(int) ((12 * Math.random())) * 50;
-            if(director.getPane().getChildren().stream().filter(node -> node instanceof Element).
-                    noneMatch(node -> ((Element)node).getXCenter()==xCenter&&
-                            ((Element) node).getYCenter()==yCenter)) {
-                director.getPane().getChildren().add(new Wall(xCenter, yCenter, Type.BRICK));
-                i++;
-            }
-        }
-    }
-    private void loadIronWalls(){
-        for (int i = 1; i < 12; i += 2) {
-            for (int j = 1; j < 8; j += 2) {
-                director.getPane().getChildren().
-                        add(new Wall(50 * i + 50, 50 * j + 50, Type.IRON));
-            }
-        }
-    }
+
     private void readMapFile(){
         String line;
         int row=0;
@@ -133,7 +119,7 @@ public class Map implements Serializable {
                 BufferedReader bufferedReader = new BufferedReader(fileReader);
         ){
             while((line = bufferedReader.readLine())!=null&&!line.trim().equals("var board = [")) {
-                System.out.println("");
+                System.out.print("");
             }
             while((line = bufferedReader.readLine())!=null&&!line.trim().equals("];")
                     &&!line.trim().equals("print_board(board);")) {

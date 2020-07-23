@@ -4,6 +4,7 @@ import ir.ac.kntu.logic.Player;
 
 import java.io.*;
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class FileManager implements Serializable{
     public synchronized ArrayList<Player> loadPlayers(String address){
@@ -27,19 +28,21 @@ public class FileManager implements Serializable{
         }
         return players;
     }
+
     public synchronized void storeInFile(ArrayList<Player> players, String address){
         ArrayList<Player> oldPlayers = loadPlayers("players.txt");
         try (
-                FileOutputStream fileOutputStream = new FileOutputStream(address);
+                FileOutputStream fileOutputStream = new FileOutputStream(address, false);
                 ObjectOutputStream objectOutputStream = new ObjectOutputStream(fileOutputStream)
         ) {
             for(Player player :players){
                 for(Player oldOne:oldPlayers){
-                    player.setNumberOfGames(player.equals(oldOne)?oldOne.getNumberOfGames():player.getNumberOfGames());
-                    player.setWins(player.equals(oldOne)?oldOne.getWins():player.getWins());
+                    oldOne.setNumberOfGames(player.equals(oldOne)?oldOne.getNumberOfGames():player.getNumberOfGames());
+                    oldOne.setWins(player.equals(oldOne)?oldOne.getWins():player.getWins());
                 }
             }
-            for(Player player:players){
+            mergePlayers(oldPlayers, players);
+            for(Player player:oldPlayers){
                 objectOutputStream.writeObject(player);
             }
         } catch (FileNotFoundException e) {
@@ -47,5 +50,8 @@ public class FileManager implements Serializable{
         } catch (IOException e) {
             System.out.println("Something went wrong while trying to store in file");
         }
+    }
+    private void mergePlayers(ArrayList<Player> oldPlayer, ArrayList<Player> players){
+        oldPlayer.addAll(players.stream().filter(player -> !oldPlayer.contains(player)).collect(Collectors.toList()));
     }
 }

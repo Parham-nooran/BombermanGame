@@ -12,6 +12,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class Director implements Runnable {
     private ArrayList<Player> players;
@@ -20,21 +21,19 @@ public class Director implements Runnable {
     private Map map;
     private boolean finished;
     private boolean closed;
-    private Integer numberOfPlayers;
     private Main main;
     private String mapFile;
     private Stage stage;
     private Scene scene;
-    public  Director(SerializedPane pane, Stage stage, Scene scene, Integer numberOfPlayers, String mapFile) {
+    public  Director(SerializedPane pane, Stage stage, Scene scene, String mapFile) {
         this.mapFile = mapFile;
         this.players = new ArrayList<>();
-        this.numberOfPlayers = numberOfPlayers;
         this.scene = scene;
         this.timer = new Timer(pane, 0, 3,0,true);
         this.stage = stage;
         this.pane = pane;
         this.closed = false;
-        this.map = new Map(this, mapFile);
+        this.map = new Map(this, mapFile, 50);
         this.finished = false;
         setStageStatus();
     }
@@ -43,6 +42,13 @@ public class Director implements Runnable {
             setClosed(true);
             stage.close();
         });
+    }
+    public void addAll(ArrayList<Player> players){
+        this.players.addAll(players.stream().filter(player -> !this.players.contains(player)).
+                collect(Collectors.toList()));
+    }
+    public void removeAll(ArrayList<Player> players){
+        this.players.removeAll(players);
     }
     public void setMap(Map map) {
         this.map = map;
@@ -89,13 +95,27 @@ public class Director implements Runnable {
     public boolean isClosed() {
         return closed;
     }
-
+    public void addPlayer(Player player){
+        players.add(player);
+    }
     private void load(){
         map.load();
-        makePlayers(new String[]{"Normal","Red", "Yellow", "Black"}, new String[]{"", "_red", "_yellow", "_black"});
+        relocatePlayers();
+        players.iterator().forEachRemaining(player -> player.setPane(pane));
         players.iterator().forEachRemaining(Player::load);
         new Random(this).start();
         timer.load();
+    }
+    public ArrayList<Player> getPlayers() {
+        return new ArrayList<>(players);
+    }
+    private void relocatePlayers(){
+        ArrayList<Integer> availableCoordinates = map.getPlayersCoordinates(false);
+        players.iterator().forEachRemaining(player -> {
+            int random = Random.getRandomInt(0,availableCoordinates.size());
+            player.relocate(availableCoordinates.get(random)/1000, availableCoordinates.get(random)%1000);
+            availableCoordinates.remove(random);
+        });
     }
     @Override
     public void run(){
@@ -117,6 +137,11 @@ public class Director implements Runnable {
             }
         });
     }
+
+    public Map getMap() {
+        return map;
+    }
+
     public Main getMain() {
         return main;
     }
@@ -225,20 +250,20 @@ public class Director implements Runnable {
         }
     }
 
+    public Scene getScene() {
+        return scene;
+    }
+
     public boolean isFinished() {
         return finished;
     }
 
-    public void makePlayers(String[]names, String[]colors) {
-        for(int i=0;i<numberOfPlayers;i++){
-            players.add(new Player(names[i], map.getPlayersCoordinates().get(i)/1000,
-                    map.getPlayersCoordinates().get(i)%1000, pane, getPlayerImages(colors[i]),timer));
-        }
+
+    public Timer getTimer() {
+        return timer;
     }
 
-
-
-    private String[] getPlayerImages(String color){
+    public String[] getPlayerImages(String color){
         String [] playerImages = new String[8];
         playerImages[0] = "src/main/resources/assets/player"+color+"/player"+color+"_right_standing.png";
         playerImages[1] = "src/main/resources/assets/player"+color+"/player"+color+"_right_moving.png";

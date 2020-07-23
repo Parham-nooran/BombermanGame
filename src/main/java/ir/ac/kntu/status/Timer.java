@@ -19,12 +19,18 @@ public class Timer implements Runnable, Serializable {
     public Timer(SerializedPane pane, int hour, int minute, int second, boolean countDown){
         this(hour, minute, second, countDown);
         this.label = new SerializedLabel();
+        this.pane = pane;
+        setLabelStatus();
+        checkTime();
+    }
+    private void setLabelStatus(){
         label.setLayoutX(200);
         label.setLayoutY(5);
-        this.pane = pane;
         label.setTextFill(Color.WHITE);
         label.setScaleX(3);
         label.setScaleY(2);
+    }
+    private void checkTime(){
         if(countDown&&second+minute+hour<=0){
             finished = true;
         }
@@ -78,7 +84,7 @@ public class Timer implements Runnable, Serializable {
     }
 
     public void setBeginAndEnd(Integer target, Integer end) {
-        this.object = object;
+        this.object = target;
         this.end = end;
     }
     public void countUp(){
@@ -102,7 +108,6 @@ public class Timer implements Runnable, Serializable {
         this.label.setText(current);
     }
 
-
     public void setThread(){
         Thread thread = new Thread(() ->{
             while(!finished){
@@ -125,7 +130,4 @@ public class Timer implements Runnable, Serializable {
         return minute;
     }
 
-    public int getHour() {
-        return hour;
-    }
 }

@@ -78,6 +78,9 @@ public class Random implements Runnable{
     public int getRandomInt(int maximum){
         return (int)(Math.random()*maximum);
     }
+    public static int getRandomInt(int minimum, int maximum){
+        return (int)(Math.random()*maximum)+minimum;
+    }
     public boolean isThereAnElement(int xCenter, int yCenter){
         return director.getPane().getChildren().stream().filter(node -> node instanceof Element).
                 anyMatch(node -> ((Element) node).getXCenter() == xCenter &&

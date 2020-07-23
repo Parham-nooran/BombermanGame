@@ -34,8 +34,6 @@ public class Player extends Element implements Movable, Bomber, Serializable, Co
         this.bombRadius = 150;
         this.addresses = addresses;
         this.pane = pane;
-        this.setImage(loadImage(addresses[xCenter>270?2:0]));
-        setImageStatus();
         this.timer = timer;
     }
     public Image loadImage(String address){
@@ -133,6 +131,8 @@ public class Player extends Element implements Movable, Bomber, Serializable, Co
     }
 
     public void load(){
+        this.setImage(loadImage(addresses[getXCenter()>270?2:0]));
+        setImageStatus();
         pane.getChildren().add(this);
         this.isAlive = true;
         removeBrickWall();
@@ -145,6 +145,11 @@ public class Player extends Element implements Movable, Bomber, Serializable, Co
         return node instanceof Wall&&((Wall) node).getType().equals(Type.BRICK)&&
                 ((Wall) node).getXCenter()==getXCenter()&&((Wall) node).getYCenter()==getYCenter();
     }
+
+    public void setPane(SerializedPane pane) {
+        this.pane = pane;
+    }
+
     @Override
     public void bomb() {
         setBomb();
@@ -169,7 +174,11 @@ public class Player extends Element implements Movable, Bomber, Serializable, Co
     public int getNumberOfGames() {
         return numberOfGames;
     }
-
+    public void relocate(int xCenter, int yCenter){
+        super.relocate(xCenter, yCenter);
+        this.setXCenter(xCenter);
+        this.setYCenter(yCenter);
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) {

@@ -21,16 +21,15 @@ public class Main extends Menu {
     public Main(SerializedPane pane, Stage stage, Scene scene){
         super(pane);
         this.stage = stage;
-        this.start = new Button("Start");
+        this.start = new Button("Continue");
         setStartStatus();
         this.spinner = new Spinner<>();
         setSpinnerStatus();
         setLabelStatus();
         this.exit = new Button("Exit");
-        setEndStatus();
+        setExitStatus();
         this.setOnAction(pane);
         this.scene = scene;
-
     }
     public void load(){
         getPane().getChildren().addAll(start, exit, spinner, label);
@@ -44,30 +43,30 @@ public class Main extends Menu {
         spinner.setMinSize(100,50);
         this.spinner.setValueFactory(getValueFactory(numberOfPlayers));
         spinner.setLayoutX(300);
-        spinner.setLayoutY(250);
+        spinner.setLayoutY(300);
 
     }
     private void setLabelStatus(){
         this.label = new Label("Number of Players");
         label.setLayoutX(150);
-        label.setLayoutY(270);
+        label.setLayoutY(320);
     }
     private SpinnerValueFactory<Integer> getValueFactory(int initialValue){
         return new SpinnerValueFactory.IntegerSpinnerValueFactory(2,4, initialValue);
     }
-    private void setEndStatus(){
+    private void setExitStatus(){
         exit.setMinSize(150,50);
         exit.setLayoutX(300);
-        exit.setLayoutY(300);
+        exit.setLayoutY(400);
     }
 
     public void setOnAction(SerializedPane pane){
         start.setOnAction( EventHandler ->{
             pane.getChildren().removeAll(pane.getChildren());
-            this.director = new Director(pane, stage, scene, numberOfPlayers,
+            this.director = new Director(pane, stage, scene,
                     "src/main/resources/map-builder/index.html");
             scene.setOnKeyPressed(this.director::actionOnKeyPress);
-            director.start();
+            new Players(director, numberOfPlayers).load();
         });
         spinner.valueProperty().addListener((observable, oldValue, newValue) -> numberOfPlayers=newValue);
         exit.setOnAction(EventHandler ->{
