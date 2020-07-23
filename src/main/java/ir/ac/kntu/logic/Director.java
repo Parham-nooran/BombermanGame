@@ -29,7 +29,7 @@ public class Director implements Runnable {
         this.mapFile = mapFile;
         this.players = new ArrayList<>();
         this.scene = scene;
-        this.timer = new Timer(pane, 0, 3,0,true);
+        this.timer = new Timer(pane, 0, 3,0,true, false);
         this.stage = stage;
         this.pane = pane;
         this.closed = false;
@@ -80,6 +80,34 @@ public class Director implements Runnable {
 
     public void start(){
         load();
+        startTheGame();
+
+    }
+
+    private void startTheGame(){
+        Timer newTimer = new Timer(pane, 0, 0, 5, true, true);
+        newTimer.load(340, 250, 20);
+        new Thread(() -> {
+            try{
+                Thread.sleep(6000);
+            } catch (InterruptedException e){
+                System.out.println("Timer was interrupted");
+            }
+            Platform.runLater(() -> {
+                startThread();
+                players.iterator().forEachRemaining(Player::load);
+                new Random(this).start();
+                timer.load();
+            });
+        }).start();
+    }
+    public boolean isClosed() {
+        return closed;
+    }
+    public void addPlayer(Player player){
+        players.add(player);
+    }
+    private void startThread(){
         Thread thread = new Thread(() ->{
             while(!finished){
                 try{
@@ -95,21 +123,11 @@ public class Director implements Runnable {
         });
         thread.start();
     }
-
-
-    public boolean isClosed() {
-        return closed;
-    }
-    public void addPlayer(Player player){
-        players.add(player);
-    }
     private void load(){
         map.load();
         relocatePlayers();
         players.iterator().forEachRemaining(player -> player.setPane(pane));
-        players.iterator().forEachRemaining(Player::load);
-        new Random(this).start();
-        timer.load();
+
     }
     public ArrayList<Player> getPlayers() {
         return new ArrayList<>(players);

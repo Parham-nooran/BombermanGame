@@ -1,14 +1,12 @@
 package ir.ac.kntu.menu;
 
 import ir.ac.kntu.logic.Player;
-import ir.ac.kntu.logic.Random;
 import javafx.collections.FXCollections;
 import javafx.scene.control.Button;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 
-import java.beans.EventHandler;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -61,7 +59,6 @@ public class NewPlayer {
         color.setTooltip(new Tooltip("Color"));
     }
     private void setOnAddAction(){
-        int random = Random.getRandomInt(0, players.getAvailableCoordinates().size());
         add.setOnAction(EventHandler ->{
             if(checkText()&&!color.getSelectionModel().isEmpty()) {
                 players.addPlayer(new Player(name.getText(), 0, 0,

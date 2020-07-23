@@ -20,6 +20,7 @@ public class Ranking {
         this.players = director.getPlayers();
         //on = true;
         Collections.sort(players);
+        players.get(0).setWins(players.get(0).getWins()+1);
         setOkStatus();
         setAction();
         loadPlayers();

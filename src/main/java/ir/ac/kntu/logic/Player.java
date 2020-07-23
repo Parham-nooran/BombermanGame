@@ -101,7 +101,7 @@ public class Player extends Element implements Movable, Bomber, Serializable, Co
     }
     private void addBombRadius(){
         Timer timer = new Timer(0, 0, 15, true);
-        timer.setThread();
+        timer.startThread();
         bombRadius = 250;
         timer.setBeginAndEnd(this.bombRadius, 150);
     }
