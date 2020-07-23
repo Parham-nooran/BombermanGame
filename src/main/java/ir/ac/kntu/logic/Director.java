@@ -50,10 +50,15 @@ public class Director implements Runnable {
     public void removeAll(ArrayList<Player> players){
         this.players.removeAll(players);
     }
-    public void setMap(Map map) {
-        this.map = map;
+
+    public Main getMain() {
+        return main;
     }
 
+    public void setMapFile(String mapFile){
+        this.mapFile = mapFile;
+        this.map = new Map(this, mapFile, 50);
+    }
     public SerializedPane getPane() {
         return pane;
     }
@@ -140,10 +145,6 @@ public class Director implements Runnable {
 
     public Map getMap() {
         return map;
-    }
-
-    public Main getMain() {
-        return main;
     }
 
     public void setFinished(boolean finished) {

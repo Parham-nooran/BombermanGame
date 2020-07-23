@@ -21,7 +21,6 @@ public class Map implements Serializable {
         elements = new String[12][];
         this.size = size;
         playersCoordinates = new ArrayList<>();
-        director.setMap(this);
     }
     public void load()  {
         try {

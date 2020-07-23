@@ -12,7 +12,7 @@ import javafx.scene.control.SelectionMode;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-public class Players {
+public class Players extends Menu{
     private ArrayList<Player> oldPlayers;
     private ListView<String> listView;
     private ObservableList<String> list;
@@ -23,6 +23,7 @@ public class Players {
     private ArrayList<Integer> coordinates;
     private ArrayList<Integer> availableCoordinates;
     public Players(Director director, int numberOfPlayers) {
+        super(director.getPane());
         oldPlayers = new FileManager().loadPlayers("players.txt");
         this.director = director;
         this.numberOfPlayers = numberOfPlayers;
@@ -39,7 +40,8 @@ public class Players {
     }
     private void setListViewStatus(){
         listView.setItems(list);
-        listView.relocate(270,10);
+        listView.relocate(250,10);
+        listView.setMaxHeight(300);
         listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
         listView.setOnMouseClicked(EventHandler ->{
             ObservableList<String> item =  listView.getSelectionModel().getSelectedItems();
@@ -55,18 +57,18 @@ public class Players {
     }
     public void load(){
         checkSizeOfPlayers();
-        director.getPane().getChildren().addAll(listView, button, newPlayer);
+        getPane().getChildren().addAll(listView, button, newPlayer);
     }
     private void setNewPlayersStatus(){
         newPlayer.setMinSize(150,50);
-        newPlayer.setLayoutX(330);
-        newPlayer.setLayoutY(420);
+        newPlayer.setLayoutX(300);
+        newPlayer.setLayoutY(350);
         setOnNewPlayersAction();
     }
     private void setButtonStatus(){
         button.setMinSize(150,50);
-        button.setLayoutX(330);
-        button.setLayoutY(500);
+        button.setLayoutX(300);
+        button.setLayoutY(450);
         button.setDisable(true);
         setButtonAction();
     }
@@ -76,7 +78,7 @@ public class Players {
     }
     private void setOnNewPlayersAction(){
         newPlayer.setOnAction(EventHandler ->{
-            director.getPane().getChildren().removeAll(director.getPane().getChildren());
+            getPane().getChildren().removeAll(director.getPane().getChildren());
             new NewPlayer(this).load();
         });
     }
@@ -92,8 +94,8 @@ public class Players {
 
     public void setButtonAction(){
         button.setOnAction(EventHandler -> {
-            director.getPane().getChildren().removeAll(director.getPane().getChildren());
-            director.start();
+            getPane().getChildren().removeAll(director.getPane().getChildren());
+            new Maps(this).load();
         });
     }
     public void addPlayer(Player player){
