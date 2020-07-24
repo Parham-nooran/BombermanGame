@@ -33,12 +33,15 @@ public class Players extends Menu{
         this.numberOfPlayers = numberOfPlayers;
         this.button = new Button("Continue");
         this.newPlayer = new Button("Add Player");
-        this.list = FXCollections.observableArrayList(oldPlayers.stream().parallel()
-                .map(player -> player.getName()+"   Games : "+player.getNumberOfGames()+"   Wins : "+player.getWins())
-                .collect(Collectors.toList()));
         listView = new ListView<>();
         this.coordinates = director.getMap().getPlayersCoordinates(false);
         this.availableCoordinates = availableCoordinates();
+        initialize();
+    }
+    private void initialize(){
+        this.list = FXCollections.observableArrayList(oldPlayers.stream().parallel()
+                .map(player -> player.getName()+"   Games : "+player.getNumberOfGames()+"   Wins : "+player.getWins())
+                .collect(Collectors.toList()));
         setListViewStatus();
         setNewPlayersStatus();
         setButtonStatus();
@@ -56,12 +59,16 @@ public class Players extends Menu{
         });
     }
     private void checkSelectedItems(ObservableList<String> item){
-        director.addAll(oldPlayers.stream().filter(player -> item.contains(player.getName()+
-                "   Games : "+player.getNumberOfGames()+"   Wins : "+player.getWins()))
-                .collect(Collectors.toCollection(ArrayList::new)));
+        director.addAll(getAddablePlayers(item));
+        getAddablePlayers(item).iterator().forEachRemaining(player -> player.setControl(Control.USER));
         director.removeAll(oldPlayers.stream().filter(player -> !item.contains(player.getName()+
                 "   Games : "+player.getNumberOfGames()+"   Wins : "+player.getWins()))
                 .collect(Collectors.toCollection(ArrayList::new)));
+    }
+    private ArrayList<Player> getAddablePlayers(ObservableList<String> item){
+        return oldPlayers.stream().filter(player -> item.contains(player.getName()+
+                "   Games : "+player.getNumberOfGames()+"   Wins : "+player.getWins()))
+                .collect(Collectors.toCollection(ArrayList::new));
     }
     private void setBackStatus(){
         back.setMinSize(150,50);
@@ -115,14 +122,16 @@ public class Players extends Menu{
     public void setButtonAction(){
         button.setOnAction(EventHandler -> {
             getPane().getChildren().removeAll(director.getPane().getChildren());
-            new Maps(this).load();
+            new TypeOfPlayer(this).load();
         });
     }
     public void addPlayer(Player player){
+        player.setControl(Control.USER);
         director.addPlayer(player);
     }
 
     public Director getDirector() {
         return director;
     }
+
 }

@@ -44,7 +44,6 @@ public class Main extends Menu {
         this.spinner.setValueFactory(getValueFactory(numberOfPlayers));
         spinner.setLayoutX(300);
         spinner.setLayoutY(300);
-
     }
     private void setLabelStatus(){
         this.label = new Label("Number of Players");
@@ -69,6 +68,9 @@ public class Main extends Menu {
             new Players(director, numberOfPlayers, this).load();
         });
         spinner.valueProperty().addListener((observable, oldValue, newValue) -> numberOfPlayers=newValue);
+        setOnExitAction();
+    }
+    private void setOnExitAction(){
         exit.setOnAction(EventHandler ->{
             if(director!=null) {
                 director.setFinished(true);

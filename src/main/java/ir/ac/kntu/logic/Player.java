@@ -3,6 +3,7 @@ package ir.ac.kntu.logic;
 import ir.ac.kntu.map.OneWay;
 import ir.ac.kntu.map.Type;
 import ir.ac.kntu.map.Wall;
+import ir.ac.kntu.menu.Control;
 import ir.ac.kntu.status.Timer;
 import javafx.application.Platform;
 import javafx.scene.Node;
@@ -28,6 +29,7 @@ public class Player extends Element implements Movable, Bomber, Serializable, Co
     private int bombRadius;
     private int activeBombs;
     private Timer timer;
+    private Control control;
     public Player(String name, int xCenter, int yCenter, SerializedPane pane, String[]addresses, Timer timer){
         super(xCenter, yCenter);
         this.name = name;
@@ -36,6 +38,7 @@ public class Player extends Element implements Movable, Bomber, Serializable, Co
         this.addresses = addresses;
         this.pane = pane;
         this.timer = timer;
+        this.control = Control.USER;
     }
     public Image loadImage(String address){
         try{
@@ -81,7 +84,7 @@ public class Player extends Element implements Movable, Bomber, Serializable, Co
         this.activeBombs = activeBombs;
     }
 
-    private boolean checkDestination(Direction direction){
+    public boolean checkDestination(Direction direction){
         return pane.getChildren().stream().filter(node -> node instanceof Bomb || node instanceof Wall &&
                 (!((Wall) node).getType().equals(Type.ONE_WAY)||
                         (((Wall) node).getType().equals(Type.ONE_WAY)&&
@@ -136,7 +139,13 @@ public class Player extends Element implements Movable, Bomber, Serializable, Co
         setImageStatus();
         pane.getChildren().add(this);
         this.isAlive = true;
+        checkAI();
         removeBrickWall();
+    }
+    private void checkAI(){
+        if(control.equals(Control.AI)){
+            new AI(this).load();
+        }
     }
     private void removeBrickWall(){
         pane.getChildren().removeAll(pane.getChildren().stream().filter(this::filterWalls).
@@ -231,6 +240,14 @@ public class Player extends Element implements Movable, Bomber, Serializable, Co
                 ", activeBombs=" + activeBombs +
                 ", timer=" + timer +
                 '}';
+    }
+
+    public Control getControl() {
+        return control;
+    }
+
+    public void setControl(Control control) {
+        this.control = control;
     }
 
     @Override

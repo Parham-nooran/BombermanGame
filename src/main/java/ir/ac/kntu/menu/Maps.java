@@ -13,8 +13,9 @@ public class Maps {
     private Players players;
     private Button start;
     private Button back;
-
-    public Maps(Players players) {
+    private TypeOfPlayer typeOfPlayer;
+    public Maps(Players players, TypeOfPlayer typeOfPlayer) {
+        this.typeOfPlayer = typeOfPlayer;
         this.players = players;
         this.list = FXCollections.observableArrayList("Index", "Django");
         listView = new ListView<>();
@@ -50,7 +51,7 @@ public class Maps {
     private void setBackAction(){
         back.setOnAction(EventHandler ->{
             players.getDirector().getPane().getChildren().removeAll(players.getDirector().getPane().getChildren());
-            players.load();
+            typeOfPlayer.load();
         });
     }
     private void setListViewStatus(){

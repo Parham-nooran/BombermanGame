@@ -2,6 +2,7 @@ package ir.ac.kntu.logic;
 
 import ir.ac.kntu.file.FileManager;
 import ir.ac.kntu.map.Map;
+import ir.ac.kntu.menu.Control;
 import ir.ac.kntu.menu.Main;
 import ir.ac.kntu.menu.Ranking;
 import ir.ac.kntu.status.Timer;
@@ -145,7 +146,8 @@ public class Director implements Runnable {
     }
     @Override
     public void run(){
-        finished = timer.isFinished()|| pane.getChildren().stream().filter(node -> node instanceof Player).count()<2;
+        finished = closed || timer.isFinished()|| pane.getChildren().stream().filter(node ->
+                node instanceof Player).count()<2;
         timer.setFinished(finished);
         if(finished&&!closed){
             checkPlayers();
@@ -179,7 +181,7 @@ public class Director implements Runnable {
     }
     private void movePlayer1(KeyCode keyCode){
         Player player = players.get(0);
-        if(player.isAlive()){
+        if(player.isAlive()&&player.getControl().equals(Control.USER)){
             switch (keyCode){
                 case UP:
                     player.move(Direction.UP);
@@ -202,7 +204,7 @@ public class Director implements Runnable {
     }
     private void movePlayer2(KeyCode keyCode){
         Player player = players.get(1);
-        if(player.isAlive()){
+        if(player.isAlive()&&player.getControl().equals(Control.USER)){
             switch (keyCode){
                 case W:
                     player.move(Direction.UP);
@@ -225,7 +227,7 @@ public class Director implements Runnable {
     }
     private void movePlayer3(KeyCode keyCode){
         Player player = players.get(2);
-        if(player.isAlive()){
+        if(player.isAlive()&&player.getControl().equals(Control.USER)){
             switch (keyCode){
                 case T:
                     player.move(Direction.UP);
@@ -248,7 +250,7 @@ public class Director implements Runnable {
     }
     private void movePlayer4(KeyCode keyCode){
         Player player = players.get(3);
-        if(player.isAlive()){
+        if(player.isAlive()&&player.getControl().equals(Control.USER)){
             switch (keyCode){
                 case I:
                     player.move(Direction.UP);
