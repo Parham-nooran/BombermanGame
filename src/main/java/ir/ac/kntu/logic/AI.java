@@ -4,12 +4,15 @@ import javafx.application.Platform;
 import javafx.scene.Node;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class AI {
     private Player player;
+    private boolean search;
     public AI(Player player) {
         this.player = player;
+        this.search = true;
     }
 
     public void load(){
@@ -24,12 +27,37 @@ public class AI {
                     System.out.println("AI interrupted");
                 }
                 if(player.isAlive()) {
-                    Platform.runLater(this::findAWay);
+                    Platform.runLater(() -> {
+                        if(search) {
+                            findAWay();
+                        }
+                        checkArea();
+                        setBomb();
+                    });
                 }
             }
         }).start();
     }
-
+    private void setBomb(){
+        if(getDistance(nearestPlayer())<50){
+            player.setBomb();
+        }
+    }
+    private void checkArea(){
+        List<Node> bombs =  player.getPane().getChildren().stream().filter(node -> node instanceof Bomb&&
+                getDistance(player, ((Bomb) node).getXCenter(), ((Bomb) node).getYCenter())<150).
+                collect(Collectors.toList());
+        if(!bombs.isEmpty()){
+            for(Direction direction:checkDirections()){
+                if (getDistance(nearestPlayer(), player.getXCenter() + direction.getXValue(),
+                        player.getYCenter() + direction.getYValue()) > getDistance(player,
+                        ((Bomb)bombs.get(0)).getXCenter(), ((Bomb)bombs.get(0)).getYCenter())) {
+                    player.move(direction);
+                }
+            }
+        }
+        search = bombs.isEmpty();
+    }
     public void findAWay(){
         if(!checkDirections().isEmpty()){
             for(Direction direction:checkDirections()){
