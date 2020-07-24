@@ -15,7 +15,6 @@ public class Timer implements Runnable, Serializable {
     private boolean countDown;
     private boolean finished;
     private Integer object;
-    private Thread thread;
     private Integer end;
     private boolean onlySecond;
     public Timer(SerializedPane pane, int hour, int minute, int second, boolean countDown, boolean onlySecond){
@@ -122,7 +121,7 @@ public class Timer implements Runnable, Serializable {
         this.label.setText(second?String.format("%2d",this.second):String.format("%02d : %02d",minute,this.second));
     }
     public void startThread(){
-        this.thread = new Thread(() ->{
+        new Thread(() ->{
             while(!finished){
                 Platform.runLater(this);
                 try{
@@ -131,13 +130,9 @@ public class Timer implements Runnable, Serializable {
                     e.printStackTrace();
                 }
             }
-        });
-        thread.start();
+        }).start();
     }
 
-    public Thread getThread() {
-        return thread;
-    }
 
     public int getSecond() {
         return second;

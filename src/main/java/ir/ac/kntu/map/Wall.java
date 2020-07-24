@@ -1,8 +1,8 @@
 package ir.ac.kntu.map;
 
-import ir.ac.kntu.logic.Element;
+import ir.ac.kntu.logic.Uncrossable;
 
-public class Wall extends Element {
+public class Wall extends Uncrossable {
     private Type type;
     public Wall(int xCenter, int yCenter, Type type){
         super(type.getImage(), xCenter, yCenter);

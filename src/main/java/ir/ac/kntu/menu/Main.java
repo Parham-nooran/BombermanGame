@@ -66,7 +66,7 @@ public class Main extends Menu {
             this.director = new Director(pane, stage, scene,
                     "src/main/resources/map-builder/index.html");
             scene.setOnKeyPressed(this.director::actionOnKeyPress);
-            new Players(director, numberOfPlayers).load();
+            new Players(director, numberOfPlayers, this).load();
         });
         spinner.valueProperty().addListener((observable, oldValue, newValue) -> numberOfPlayers=newValue);
         exit.setOnAction(EventHandler ->{

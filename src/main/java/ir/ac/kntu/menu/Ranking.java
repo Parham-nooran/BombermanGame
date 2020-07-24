@@ -5,7 +5,6 @@ import ir.ac.kntu.logic.Player;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.paint.Color;
-
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -20,7 +19,6 @@ public class Ranking {
         this.players = director.getPlayers();
         //on = true;
         Collections.sort(players);
-        players.get(0).setWins(players.get(0).getWins()+1);
         setOkStatus();
         setAction();
         loadPlayers();

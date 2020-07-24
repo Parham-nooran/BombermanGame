@@ -14,7 +14,9 @@ public class Random implements Runnable{
     }
     @Override
     public void run(){
-        action();
+        if(!director.isFinished()) {
+            action();
+        }
     }
     private void action(){
         switch (getRandomInt(4)){

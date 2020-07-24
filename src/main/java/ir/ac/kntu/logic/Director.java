@@ -77,16 +77,16 @@ public class Director implements Runnable {
             }
         }
     }
-
     public void start(){
         load();
-        startTheGame();
-
+        startCountDown();
     }
-
-    private void startTheGame(){
+    private void startCountDown(){
         Timer newTimer = new Timer(pane, 0, 0, 5, true, true);
         newTimer.load(340, 250, 20);
+        startTheGame();
+    }
+    public void startTheGame(){
         new Thread(() -> {
             try{
                 Thread.sleep(6000);
@@ -126,7 +126,10 @@ public class Director implements Runnable {
     private void load(){
         map.load();
         relocatePlayers();
-        players.iterator().forEachRemaining(player -> player.setPane(pane));
+        players.iterator().forEachRemaining(player -> {
+            player.setPane(pane);
+            player.setTimer(timer);
+        });
 
     }
     public ArrayList<Player> getPlayers() {
@@ -155,19 +158,17 @@ public class Director implements Runnable {
     private void checkPlayers(){
         players.iterator().forEachRemaining(player -> {
             if(player.isAlive()){
-                player.setTime(0);
+                player.setWins(player.getWins()+1);
                 player.kill();
+                player.setTime(0);
             }
         });
     }
-
     public Map getMap() {
         return map;
     }
-
     public void setFinished(boolean finished) {
         this.finished = finished;
-
     }
     public void setClosed(boolean closed) {
         this.closed = closed;
@@ -268,20 +269,15 @@ public class Director implements Runnable {
             }
         }
     }
-
     public Scene getScene() {
         return scene;
     }
-
     public boolean isFinished() {
         return finished;
     }
-
-
     public Timer getTimer() {
         return timer;
     }
-
     public String[] getPlayerImages(String color){
         String [] playerImages = new String[8];
         playerImages[0] = "src/main/resources/assets/player"+color+"/player"+color+"_right_standing.png";

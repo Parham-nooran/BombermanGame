@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class Bomb extends Element implements Runnable{
+public class Bomb extends Uncrossable implements Runnable{
     private Pane pane;
     private int radius;
     private Player player;

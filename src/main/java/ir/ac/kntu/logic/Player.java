@@ -32,6 +32,7 @@ public class Player extends Element implements Movable, Bomber, Serializable, Co
         super(xCenter, yCenter);
         this.name = name;
         this.bombRadius = 150;
+        this.wins = 0;
         this.addresses = addresses;
         this.pane = pane;
         this.timer = timer;
@@ -81,12 +82,12 @@ public class Player extends Element implements Movable, Bomber, Serializable, Co
     }
 
     private boolean checkDestination(Direction direction){
-        return pane.getChildren().stream().filter(node ->  node instanceof Wall &&
+        return pane.getChildren().stream().filter(node -> node instanceof Bomb || node instanceof Wall &&
                 (!((Wall) node).getType().equals(Type.ONE_WAY)||
                         (((Wall) node).getType().equals(Type.ONE_WAY)&&
                                 !((OneWay) node).getSide().getOpenDirection().equals(direction)))).
-                noneMatch(node -> ((Wall) node).getXCenter() == getXCenter() + direction.getXValue() &&
-                        ((Wall) node).getYCenter() == getYCenter() + direction.getYValue());
+                noneMatch(node -> ((Uncrossable) node).getXCenter() == getXCenter() + direction.getXValue() &&
+                        ((Uncrossable) node).getYCenter() == getYCenter() + direction.getYValue());
     }
     private void checkForPowerUp(Direction direction){
         if(!getPowerUps(direction).isEmpty()){
@@ -169,6 +170,10 @@ public class Player extends Element implements Movable, Bomber, Serializable, Co
 
     public void setNumberOfGames(int numberOfGames) {
         this.numberOfGames = numberOfGames;
+    }
+
+    public void setTimer(Timer timer) {
+        this.timer = timer;
     }
 
     public int getNumberOfGames() {

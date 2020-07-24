@@ -103,8 +103,8 @@ public class Map implements Serializable {
     }
 
     private void loadBackGround(Image image){
-        for(int i=0;i<16;i++){
-            for(int j=0;j<12;j++){
+        for(int i=0;i<15;i++){
+            for(int j=0;j<11;j++){
                 director.getPane().getChildren().add(new Block(size*i,size*j,image));
             }
         }
