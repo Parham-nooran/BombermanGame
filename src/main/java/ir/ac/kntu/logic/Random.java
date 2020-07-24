@@ -37,8 +37,8 @@ public class Random implements Runnable{
         }
     }
     public void start(){
-        new Thread(() ->{
-            while(!director.isFinished()&&!director.isClosed()){
+        Thread thread = new Thread(() ->{
+            while(true){
                 try {
                     Thread.sleep(5000);
                 } catch(InterruptedException e){
@@ -48,7 +48,9 @@ public class Random implements Runnable{
                     Platform.runLater(this);
                 }
             }
-        }).start();
+        });
+        thread.setDaemon(true);
+        thread.start();
     }
     public void setBomb(){
         Block block = findRandomFreePoint();

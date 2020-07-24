@@ -121,7 +121,7 @@ public class Timer implements Runnable, Serializable {
         this.label.setText(second?String.format("%2d",this.second):String.format("%02d : %02d",minute,this.second));
     }
     public void startThread(){
-        new Thread(() ->{
+        Thread thread = new Thread(() ->{
             while(!finished){
                 Platform.runLater(this);
                 try{
@@ -130,7 +130,9 @@ public class Timer implements Runnable, Serializable {
                     e.printStackTrace();
                 }
             }
-        }).start();
+        });
+        thread.setDaemon(true);
+        thread.start();
     }
 
 

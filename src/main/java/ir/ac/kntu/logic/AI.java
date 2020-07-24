@@ -9,17 +9,16 @@ import java.util.stream.Collectors;
 
 public class AI {
     private Player player;
-    private boolean search;
+    private boolean wait;
     public AI(Player player) {
         this.player = player;
-        this.search = true;
+        wait = false;
     }
-
     public void load(){
         startThread();
     }
     public void startThread(){
-        new Thread(() ->{
+        Thread thread = new Thread(() ->{
             while(player.isAlive()){
                 try{
                     Thread.sleep(100);
@@ -28,7 +27,7 @@ public class AI {
                 }
                 if(player.isAlive()) {
                     Platform.runLater(() -> {
-                        if(search) {
+                        if(!wait) {
                             findAWay();
                         }
                         checkArea();
@@ -36,7 +35,9 @@ public class AI {
                     });
                 }
             }
-        }).start();
+        });
+        thread.setDaemon(true);
+        thread.start();
     }
     private void setBomb(){
         if(getDistance(nearestPlayer())<50){
@@ -55,8 +56,20 @@ public class AI {
                     player.move(direction);
                 }
             }
+        } else if(wait) {
+            releaseWait(3);
+        } else {
+            wait = true;
         }
-        search = bombs.isEmpty();
+    }
+    private void releaseWait(int seconds){
+        new Thread(() ->{
+            try{
+                Thread.sleep( 1000*seconds);
+            } catch (InterruptedException e){
+                wait = false;
+            }
+        }).start();
     }
     public void findAWay(){
         if(!checkDirections().isEmpty()){
@@ -65,6 +78,14 @@ public class AI {
                         player.getYCenter() + direction.getYValue()) < getDistance(nearestPlayer())) {
                     player.move(direction);
                 }
+            }
+        }
+    }
+    public void diagonalMovement(){
+        for(int i=4;i<8;i++){
+            if(player.checkDestination(Direction.values()[i])){
+                player.move(Direction.values()[i]);
+                wait = true;
             }
         }
     }
@@ -80,7 +101,6 @@ public class AI {
     public boolean checkSides(Direction direction){
         return player.checkDestination(direction);
     }
-
     public Player nearestPlayer(){
         Player minPlayer = findAPlayer();
         if(minPlayer!=null) {
