@@ -226,6 +226,10 @@ public class Player extends Element implements Movable, Bomber, Serializable, Co
         return name;
     }
 
+    public Timer getTimer() {
+        return timer;
+    }
+
     @Override
     public String toString() {
         return "Player{" +

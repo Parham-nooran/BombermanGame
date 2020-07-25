@@ -13,6 +13,7 @@ import javafx.scene.input.KeyEvent;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 public class Director implements Runnable {
@@ -158,9 +159,12 @@ public class Director implements Runnable {
         }
     }
     private void checkPlayers(){
+        Collections.sort(players);
         players.iterator().forEachRemaining(player -> {
-            if(player.isAlive()){
+            if(player.getTimer().equals(timer)&&player.getTime()==players.get(0).getTime()){
                 player.setWins(player.getWins()+1);
+            }
+            if(player.isAlive()){
                 player.kill();
                 player.setTime(0);
             }

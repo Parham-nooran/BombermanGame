@@ -37,8 +37,8 @@ public class FileManager implements Serializable{
         ) {
             for(Player player :players){
                 for(Player oldOne:oldPlayers){
-                    oldOne.setNumberOfGames(player.equals(oldOne)?oldOne.getNumberOfGames():player.getNumberOfGames());
-                    oldOne.setWins(player.equals(oldOne)?oldOne.getWins():player.getWins());
+                    oldOne.setNumberOfGames(player.equals(oldOne)?player.getNumberOfGames():oldOne.getNumberOfGames());
+                    oldOne.setWins(player.equals(oldOne)?player.getWins():oldOne.getWins());
                 }
             }
             mergePlayers(oldPlayers, players);
