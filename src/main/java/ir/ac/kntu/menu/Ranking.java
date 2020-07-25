@@ -37,9 +37,9 @@ public class Ranking {
     }
     public void load(){
         director.getPane().getChildren().add(ok);
-        for(Player player:players){
+        /*for(Player player:players){
             System.out.println(player);
-        }
+        }*/
         //dance();
     }
     private void loadPlayers(){

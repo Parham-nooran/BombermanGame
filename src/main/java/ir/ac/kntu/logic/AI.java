@@ -1,5 +1,7 @@
 package ir.ac.kntu.logic;
 
+import ir.ac.kntu.map.Type;
+import ir.ac.kntu.map.Wall;
 import javafx.application.Platform;
 import javafx.scene.Node;
 
@@ -12,7 +14,6 @@ public class AI {
     private boolean wait;
     public AI(Player player) {
         this.player = player;
-        wait = false;
     }
     public void load(){
         startThread();
@@ -26,13 +27,16 @@ public class AI {
                     System.out.println("AI interrupted");
                 }
                 if(player.isAlive()) {
-                    Platform.runLater(() -> {
-                        if(!wait) {
+                    try {
+                        Platform.runLater(() -> {
                             findAWay();
-                        }
-                        checkArea();
-                        setBomb();
-                    });
+                            checkArea();
+                            setBomb();
+                            removeWalls();
+                        });
+                    } catch (NullPointerException e){
+                        System.out.print("");
+                    }
                 }
             }
         });
@@ -56,10 +60,6 @@ public class AI {
                     player.move(direction);
                 }
             }
-        } else if(wait) {
-            releaseWait(3);
-        } else {
-            wait = true;
         }
     }
     private void releaseWait(int seconds){
@@ -86,6 +86,8 @@ public class AI {
             if(player.checkDestination(Direction.values()[i])){
                 player.move(Direction.values()[i]);
                 wait = true;
+                releaseWait(3);
+                break;
             }
         }
     }
@@ -100,6 +102,28 @@ public class AI {
     }
     public boolean checkSides(Direction direction){
         return player.checkDestination(direction);
+    }
+    private void removeWalls(){
+        for(Direction direction:notAvailAvailableDirections()){
+            if(player.getPane().getChildren().stream().anyMatch(node -> node instanceof Wall&& ((Wall)node).
+                    getType().equals(Type.BRICK)&&((Wall) node).getXCenter()==player.getXCenter()+direction.getXValue()
+                    && ((Wall) node).getYCenter()==player.getYCenter()+direction.getYValue())){
+                player.setBomb();
+                diagonalMovement();
+            }
+        }
+    }
+    private ArrayList<Direction> notAvailAvailableDirections(){
+        ArrayList<Direction> notAvailAvailableDirections = new ArrayList<>();
+        for(Direction direction: Direction.values()){
+            if(!checkSides(direction)){
+                notAvailAvailableDirections.add(direction);
+            }
+        }
+        return notAvailAvailableDirections;
+    }
+    private void checkDiagonal(Direction first, Direction second){
+
     }
     public Player nearestPlayer(){
         Player minPlayer = findAPlayer();
@@ -117,20 +141,24 @@ public class AI {
     }
     private Player findAPlayer(){
         if(player.isAlive()) {
-            return (Player) player.getPane().getChildren().stream().filter(node -> node instanceof Player &&
-                    !node.equals(player)).collect(Collectors.toList()).get(0);
+            try {
+                return (Player) player.getPane().getChildren().stream().filter(node -> node instanceof Player &&
+                        !node.equals(player)).collect(Collectors.toList()).get(0);
+            } catch (IndexOutOfBoundsException e){
+                System.out.print("");
+            }
         }
         return null;
     }
     private double getDistance(Player minPlayer){
-        if(player.isAlive()) {
+        if(player.isAlive()&&minPlayer!=null) {
             return Math.sqrt(Math.pow(player.getXCenter() - minPlayer.getXCenter(), 2) +
                     Math.pow(player.getYCenter() - minPlayer.getYCenter(), 2));
         }
         return 0.0;
     }
     private double getDistance(Player minPlayer, int xCenter, int yCenter){
-        if(player.isAlive()) {
+        if(player.isAlive()&&minPlayer!=null) {
             return Math.sqrt(Math.pow(xCenter - minPlayer.getXCenter(), 2) +
                     Math.pow(yCenter - minPlayer.getYCenter(), 2));
         }
