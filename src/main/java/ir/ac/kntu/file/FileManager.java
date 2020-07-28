@@ -24,7 +24,6 @@ public class FileManager implements Serializable{
             System.out.println("The class has been changed");
         } catch (IOException e){
             System.out.println("Something went wrong while trying to read from file");
-            e.printStackTrace();
         }
         return players;
     }

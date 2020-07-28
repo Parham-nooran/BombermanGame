@@ -1,10 +1,8 @@
 package ir.ac.kntu.logic;
-
 import ir.ac.kntu.map.Type;
 import ir.ac.kntu.map.Wall;
 import javafx.application.Platform;
 import javafx.scene.Node;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -94,15 +92,19 @@ public class AI {
     public ArrayList<Direction> checkDirections(){
         ArrayList<Direction> availableDirections = new ArrayList<>();
         for(Direction direction: Direction.values()){
-            if(checkSides(direction)){
+            if(checkSides(direction, true)){
                 availableDirections.add(direction);
             }
         }
         return availableDirections;
     }
-    public boolean checkSides(Direction direction){
-        return player.checkDestination(direction);
+    public boolean checkSides(Direction direction, boolean positive){
+        return positive?player.checkDestination(direction):player.getPane().getChildren().stream().anyMatch(node ->
+                node instanceof Wall&&((Wall) node).getType().
+                equals(Type.BRICK)&&((Wall) node).getXCenter()==player.getXCenter()+direction.getXValue()&&
+                ((Wall) node).getYCenter()==player.getYCenter()+direction.getYValue());
     }
+
     private void removeWalls(){
         for(Direction direction:notAvailAvailableDirections()){
             if(player.getPane().getChildren().stream().anyMatch(node -> node instanceof Wall&& ((Wall)node).
@@ -116,7 +118,7 @@ public class AI {
     private ArrayList<Direction> notAvailAvailableDirections(){
         ArrayList<Direction> notAvailAvailableDirections = new ArrayList<>();
         for(Direction direction: Direction.values()){
-            if(!checkSides(direction)){
+            if(!checkSides(direction, false)){
                 notAvailAvailableDirections.add(direction);
             }
         }
