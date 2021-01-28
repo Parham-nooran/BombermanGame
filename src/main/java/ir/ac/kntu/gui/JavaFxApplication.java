@@ -16,8 +16,6 @@ public class JavaFxApplication extends Application {
     }
     public void start(Stage stage)  {
         SerializedPane root = new SerializedPane();
-        //GridPane pane = new GridPane();
-        //root.setStyle("-fx-border-width: 0 0 5 0;");
         //checkPlayersFile();
         Scene scene = new Scene(root, 760, 560, Color.rgb(240, 240, 240));
         Main main = new Main(root, stage, scene);
